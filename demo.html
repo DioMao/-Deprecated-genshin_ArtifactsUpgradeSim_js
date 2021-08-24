@@ -60,24 +60,45 @@
                 }
             },
             created(){
+                if(!window.localStorage){
+                    alert("浏览器不支持localstorage");
+                    return false;
+                }else{
+                    if(localStorage.localRecord != '' || localStorage.localRecord != []){
+                        creatRelic.result = JSON.parse(localStorage.getItem("localRecord"));
+                        this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
+                    };
+                }
                 console.log("Vue is runnning.");
             },
             methods:{
                 start(){
                     creatRelic.random();
                     this.relicsList = [...creatRelic.result];
+                    this.localRecord(this.relicsList);
                 },
                 relicUpgrade(index){
                     creatRelic.upgrade(index);
                     this.relicsList = [...creatRelic.result];
+                    this.localRecord(this.relicsList);
                 },
                 relicClear(){
                     creatRelic.clearAll();
                     this.relicsList = [...creatRelic.result];
+                    this.localRecord(this.relicsList);
                 },
                 deleteRelic(index){
                     creatRelic.deleteOne(index);
                     this.relicsList = [...creatRelic.result];
+                    this.localRecord(this.relicsList);
+                },
+                localRecord(record){
+                    if(!window.localStorage){
+                        alert("浏览器不支持localstorage");
+                        return false;
+                    }else{
+                        localStorage.localRecord = JSON.stringify(record);
+                    }
                 }
             },
             computed:{
