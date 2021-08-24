@@ -83,6 +83,7 @@ RelicsFunction.prototype.random = function () {
     this.count++;
     console.log(newRelics);
     // console.log(this.result);
+    return newRelics;
 }
 
 /**
