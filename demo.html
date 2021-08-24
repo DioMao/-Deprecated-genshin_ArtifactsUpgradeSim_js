@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Genshin Relics</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <script src="js/vue@3.2.4.js"></script>
     <script src="js/relicsUpradeSim.js"></script>
     <style>
@@ -16,39 +17,46 @@
             width: 100%;
         }
         .relicsBox{
-            border: solid 1px;
             margin: 20px 10px;
-            padding: 20px;
+            width: 10rem;
+            font-size: 0.9rem;
+        }
+        .buttonBox{
+            position: fixed;
+            width: 200px;
+            right: 15%;
+            bottom: 50px;
+            z-index: 10;
         }
         #start{
-            display: block;
-            position: fixed;
-            left: 20%;
-            bottom: 10%;
+            float: left;
         }
         #clear{
-            display: block;
-            position: fixed;
-            left: 40%;
-            bottom: 10%;
+            float: right;
         }
     </style>
 </head>
 
 <body>
     <div id="vueApp">
-        <div v-for="(relics,index) in relicsList" class="relicsBox">
-            <div>等级:{{ relics.level }}</div>
-            <div>位置:{{ toChinese(relics.part,"parts") }}</div>
-            <div>主属性:{{ toChinese(relics.mainEntry,"mainEntry") }}</div>
-            <div v-for="entry in relics.entry">
-                <div>{{ toChinese(entry[0],"entry") }} : {{ Number(entry[1].toFixed(2)) }}</div>
+        <div v-for="(relics,index) in relicsList" class="relicsBox card shadow-sm rounded">
+            <div class="card-body">
+                <div class="card-text fs-6 fw-bolder">{{ toChinese(relics.part,"parts") }}</div>
+                <div class="card-text">主属性:{{ toChinese(relics.mainEntry,"mainEntry") }}</div>
+                <span class="badge bg-dark">+{{ relics.level }}</span>
             </div>
-            <button id="upgrade" @click="relicUpgrade(index)">强化</button>
-            <button id="deleteRelic" @click="deleteRelic(index)">删除</button>
+            <ul v-for="(entry,index2) in relics.entry" class="list-group list-group-flush">
+                <li class="list-group-item">{{ toChinese(entry[0],"entry") }} : {{ Number(entry[1].toFixed(2)) }}</li>
+            </ul>
+            <div class="card-body">
+                <button id="upgrade" @click="relicUpgrade(index)" class="btn btn-primary btn-sm">强化</button>
+                <button id="deleteRelic" @click="deleteRelic(index)" class="btn btn-warning btn-sm float-end">删除</button>
+            </div>
         </div>
-        <button id="start" @click="start">新增数据</button>
-        <button id="clear" @click="relicClear">清除数据</button>
+        <div class="buttonBox">
+            <button id="start" @click="start" class="btn btn-primary">新增数据</button>
+            <button id="clear" @click="relicClear" class="btn btn-danger">清除数据</button>
+        </div>
     </div>
 
     <script>
