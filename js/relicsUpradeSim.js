@@ -1,3 +1,5 @@
+// export {creatRelic,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh};
+
 var creatRelic = new RelicsFunction();
 
 // 词缀条目
@@ -113,8 +115,8 @@ RelicsFunction.prototype.upgrade = function (__index) {
                 currentEntryRate.push(entryListRate[i]);
             }
         }
-        let addEntry = randomRate(currentEntryList, currentEntryRate);
-        addRate = randomEntryValue(addEntry);
+        let addEntry = randomRate(currentEntryList, currentEntryRate),
+            addRate = randomEntryValue(addEntry);
         this.result[__index].entry.push([addEntry, addRate]);
         console.log("Upgrade success,new entry is " + addEntry + " + " + addRate);
     } else {
