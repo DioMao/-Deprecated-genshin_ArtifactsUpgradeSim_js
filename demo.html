@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genshin Relics</title>
+    <script src="js/vue@3.2.4.js"></script>
+    <script src="js/test_ys.js"></script>
+    <style>
+        #vueApp{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        .relicsBox{
+            border: solid 1px;
+            margin: 20px 10px;
+            padding: 20px;
+        }
+        #start{
+            display: block;
+            position: fixed;
+            left: 20%;
+            bottom: 10%;
+        }
+        #clear{
+            display: block;
+            position: fixed;
+            left: 40%;
+            bottom: 10%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="vueApp">
+        <div v-for="(relics,index) in relicsList" class="relicsBox">
+            <div>等级:{{ relics.level }}</div>
+            <div>位置:{{ relics.part }}</div>
+            <div>主属性:{{ relics.mainEntry}}</div>
+            <div v-for="entry in relics.entry">
+                <div>{{ entry[0] }} : {{ entry[1] }}</div>
+            </div>
+            <button id="upgrade" @click="relicUpgrade(index)">点击强化</button>
+            <button id="deleteRelic" @click="deleteRelic(index)">删除</button>
+        </div>
+        <button id="start" @click="start">点击开始生成</button>
+        <button id="clear" @click="relicClear">清除数据</button>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    slogan: "hello",
+                    relicsList: []
+                }
+            },
+            created(){
+                console.log("Vue is runnning.");
+            },
+            methods:{
+                start(){
+                    creatRelic.random();
+                    this.relicsList = [...creatRelic.result];
+                },
+                relicUpgrade(index){
+                    creatRelic.upgrade(index);
+                    this.relicsList = [...creatRelic.result];
+                },
+                relicClear(){
+                    creatRelic.clearAll();
+                    this.relicsList = [...creatRelic.result];
+                },
+                deleteRelic(index){
+                    creatRelic.deleteOne(index);
+                    this.relicsList = [...creatRelic.result];
+                }
+            },
+            computed:{
+                transLanguage(){
+                    
+                }
+            }
+        }).mount('#vueApp');
+    </script>
+</body>
+
+</html>
