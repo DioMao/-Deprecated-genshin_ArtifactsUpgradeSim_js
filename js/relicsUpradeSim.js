@@ -2,7 +2,7 @@ var creatRelic = new RelicsFunction();
 
 // 词缀条目
 const entryList = ["critRate", "critDMG", "ATK", "ATKPer", "def", "defPer", "HP", "HPPer", "energyRecharge", "elementMastery"],
-    entryListCh = ["暴击率%","暴击伤害%","攻击","攻击%","防御","防御%","生命","生命%","充能效率","元素精通"],
+    entryListCh = ["暴击率%","暴击伤害%","攻击","攻击%","防御","防御%","生命","生命%","充能效率%","元素精通"],
     entryListRate = [0.3, 0.3, 0.75, 0.5, 0.75, 0.5, 0.75, 0.5, 0.3, 0.3],
     entryValue = {
         "critRate": [2.7, 3.1, 3.5, 3.9],
@@ -26,7 +26,9 @@ const feather = ["ATK"],
     flower = ["HP"],
     hourglass = ["ATKPer", "defPer", "HPPer", "elementMastery", "energyRecharge"],
     hat = ["critRate", "critDMG", "ATKPer", "defPer", "HPPer", "elementMastery", "HPRes"],
-    cup = ["ATKPer", "defPer", "HPPer", "elementMastery", "water", "fire", "thunder", "stone", "wind", "ice", "Physical"];
+    cup = ["ATKPer", "defPer", "HPPer", "elementMastery", "water", "fire", "thunder", "stone", "wind", "ice", "Physical"],
+    mainEntryList = ["ATK", "HP", "critRate", "energyRecharge", "HPRes", "critDMG", "ATKPer", "defPer", "HPPer", "elementMastery", "water", "fire", "thunder", "stone", "wind", "ice", "Physical"],
+    mainEntryListCh = ["攻击", "生命", "暴击率%", "充能效率%", "治疗加成", "暴击伤害%", "攻击%", "防御%", "生命%", "元素精通", "水元素伤害", "火元素伤害", "雷元素伤害", "岩元素伤害", "风元素伤害", "冰元素伤害", "物理伤害"];
 
 // 部件主词条概率
 const hourglassRate = [0.26, 0.26, 0.26, 0.1, 0.1],
