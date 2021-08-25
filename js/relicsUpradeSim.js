@@ -1,6 +1,7 @@
-// export {creatRelic,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh};
+"use strict";
+// export {relicsSim,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh};
 
-var creatRelic = new RelicsFunction();
+const relicsSim = new RelicsFunction();
 
 // 词缀条目
 const entryList = ["critRate", "critDMG", "ATK", "ATKPer", "def", "defPer", "HP", "HPPer", "energyRecharge", "elementMastery"],
@@ -43,6 +44,7 @@ const hourglassRate = [0.26, 0.26, 0.26, 0.1, 0.1],
 function RelicsFunction() {
     this.result = [];
     this.count = 0;
+    this.history = [];
     this.backup = [];
 };
 
@@ -52,7 +54,8 @@ RelicsFunction.prototype.random = function () {
         level: 0,
         part: "none",
         mainEntry: "none",
-        entry: []
+        entry: [],
+        upgradeHistory: []
     }
     // 随机位置
     newRelics.part = parts[Math.floor((Math.random() * parts.length))];
@@ -101,7 +104,7 @@ RelicsFunction.prototype.upgrade = function (__index) {
     // 判断圣遗物是否满级
     if (currentRelic.level >= 20) {
         console.log("Upgrade failed,this relic is fully rated.");
-        return false
+        return false;
     };
     // 是否需要补充词条
     if (currentRelic.entry.length < 4) {
@@ -118,6 +121,7 @@ RelicsFunction.prototype.upgrade = function (__index) {
         let addEntry = randomRate(currentEntryList, currentEntryRate),
             addRate = randomEntryValue(addEntry);
         this.result[__index].entry.push([addEntry, addRate]);
+        this.result[__index].upgradeHistory.push([addEntry, addRate]);
         console.log("Upgrade success,new entry is " + addEntry + " + " + addRate);
     } else {
         // 升级随机词条
@@ -127,6 +131,7 @@ RelicsFunction.prototype.upgrade = function (__index) {
             upRate = randomEntryValue(upEntry);
         console.log("Upgrade success," + upEntry + " + " + upRate);
         this.result[__index].entry[upIndex][1] += upRate;
+        this.result[__index].upgradeHistory.push([upEntry,upRate]);
     }
     // 增加等级
     this.result[__index].level += 4;
@@ -211,7 +216,7 @@ function chooseMainEntry(__part) {
             return randomRate(cup, cupRate);
             break;
         default:
-            console.log("Error! -chooseMainEbtry-");
+            console.log("Error! -chooseMainEntry-");
     }
 }
 

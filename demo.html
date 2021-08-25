@@ -61,7 +61,7 @@
 
 <body>
     <div id="vueApp">
-        <!-- nav 暂未组件化 -->
+        <!-- nav -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">圣遗物强化模拟</a>
@@ -98,7 +98,7 @@
     </div>
 
     <!-- <script type="module">
-        import {creatRelic,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh} from "./js/relicUpgradeSim.js"
+        import {relicsSim,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh} from "./js/relicUpgradeSim.js"
     </script> -->
     <script>
         const app = Vue.createApp({
@@ -115,7 +115,7 @@
                     return false;
                 }else{
                     if(localStorage.localRecord != '' || localStorage.localRecord != []){
-                        creatRelic.result = JSON.parse(localStorage.getItem("localRecord"));
+                        relicsSim.result = JSON.parse(localStorage.getItem("localRecord"));
                         this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
                     };
                 }
@@ -124,23 +124,23 @@
             },
             methods:{
                 start(){
-                    creatRelic.random();
-                    this.relicsList = [...creatRelic.result];
+                    relicsSim.random();
+                    this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
                 relicUpgrade(index){
-                    creatRelic.upgrade(index);
-                    this.relicsList = [...creatRelic.result];
+                    relicsSim.upgrade(index);
+                    this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
                 relicClear(){
-                    creatRelic.clearAll();
-                    this.relicsList = [...creatRelic.result];
+                    relicsSim.clearAll();
+                    this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
                 deleteRelic(index){
-                    creatRelic.deleteOne(index);
-                    this.relicsList = [...creatRelic.result];
+                    relicsSim.deleteOne(index);
+                    this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
                 sortRelic(){
