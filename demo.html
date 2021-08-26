@@ -41,7 +41,6 @@
         }
         .buttonBox{
             position: fixed;
-            width: 200px;
             right: 30px;
             bottom: 15px;
             z-index: 10;
@@ -54,8 +53,11 @@
             float: left;
         }
         #clear{
-            float: right;
+            margin: 0 15px;
         }
+        /* #undoDel{
+            margin: 0 10px;
+        } */
     </style>
 </head>
 
@@ -94,6 +96,7 @@
         <div class="buttonBox">
             <button id="start" @click="start" class="btn btn-primary">新增数据</button>
             <button id="clear" @click="relicClear" class="btn btn-danger">清除数据</button>
+            <button id="undoDel" @click="undoDel" class="btn btn-success">撤销删除</button>
         </div>
     </div>
 
@@ -114,7 +117,9 @@
                     alert("浏览器不支持localstorage");
                     return false;
                 }else{
-                    if(localStorage.localRecord != '' || localStorage.localRecord != []){
+                    if(localStorage.localRecord == undefined){
+                        localStorage.localRecord = [];
+                    }else if(localStorage.localRecord != '' || localStorage.localRecord != []){
                         relicsSim.result = JSON.parse(localStorage.getItem("localRecord"));
                         this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
                     };
@@ -140,6 +145,11 @@
                 },
                 deleteRelic(index){
                     relicsSim.deleteOne(index);
+                    this.relicsList = [...relicsSim.result];
+                    this.localRecord(this.relicsList);
+                },
+                undoDel(){
+                    relicsSim.undoDel();
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },

@@ -46,6 +46,7 @@ function RelicsFunction() {
     this.count = 0;
     this.history = [];
     this.backup = [];
+    this.deleteHistory = [];
 };
 
 // 初始化
@@ -93,7 +94,7 @@ RelicsFunction.prototype.random = function () {
 
 /**
  * 升级强化
- * @param __index {number} 序号
+ * @param {number} __index 序号
  */
 RelicsFunction.prototype.upgrade = function (__index) {
     if (__index >= this.result.length || __index < 0) return false;
@@ -139,16 +140,16 @@ RelicsFunction.prototype.upgrade = function (__index) {
 }
 
 /**
- * 批量删除指定数据
- * @param __del {array} 要删除的遗物序号（数组）
+ * 删除指定数据
+ * @param {number} __del 要删除的遗物序号
  */
 RelicsFunction.prototype.deleteOne = function(__del){
-    this.result.splice(__del,1);
+    this.deleteHistory.push(this.result.splice(__del,1)[0]);
 }
 
 /**
  * 批量删除指定数据
- * @param __delArr {array} 要删除的遗物序号（数组）
+ * @param {Array} __delArr 要删除的遗物序号（数组）
  */
 RelicsFunction.prototype.batchDelete = function(__delArr){
     __delArr.sort((a,b) => a-b);
@@ -167,12 +168,23 @@ RelicsFunction.prototype.clearAll = function(){
     this.result.length = 0;
 }
 
+/**
+ * 撤销删除（对deleteOne删除的数据生效）
+ */
+RelicsFunction.prototype.undoDel = function(){
+    if(this.deleteHistory.length == 0){
+        console.log("Undo false, history not found.");
+        return false;
+    }
+    this.result.push(this.deleteHistory.pop());
+}
+
 /** 辅助函数 **/
 
 /**
  * 根据数组随机概率
- * @param __arr1 {array} 随机列表
- * @param __arr2 {array} 随机概率（对应arr1）
+ * @param {Array} __arr1  随机列表
+ * @param {Array} __arr2  随机概率（对应arr1）
  */
 function randomRate(__arr1, __arr2) {
     if (__arr1.length != __arr2.length) {
@@ -196,7 +208,7 @@ function randomRate(__arr1, __arr2) {
 
 /**
  * 随机主词条
- * @param __part {string} 位置
+ * @param {string} __part 位置
  */
 function chooseMainEntry(__part) {
     switch (__part) {
@@ -222,7 +234,7 @@ function chooseMainEntry(__part) {
 
 /** 
  * 随机副词条数值
- * @param __entry {string} 词条名称
+ * @param {string} __entry 词条名称
  */
 function randomEntryValue(__entry) {
     return entryValue[__entry][Math.floor(Math.random() * entryValue[__entry].length)];
