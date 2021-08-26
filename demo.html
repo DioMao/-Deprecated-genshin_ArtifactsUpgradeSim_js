@@ -28,6 +28,9 @@
             flex-wrap: wrap;
             position: relative;
         }
+        /* .demo-container::-webkit-scrollbar{
+            display: none;
+        } */
         .relicsBox{
             margin: 20px 10px;
             width: 10rem;
@@ -39,10 +42,21 @@
                 width: calc(50% - 20px);
             }
         }
-        .buttonBox{
+        .upgradeCheat{
+            display: inline-block;
+            position: absolute;
+            right: 5px;
+        }
+        footer{
             position: fixed;
+            width: 100%;
+            height: 10vh;
+            bottom: 0;
+        }
+        .buttonBox{
+            position: absolute;
             right: 30px;
-            bottom: 15px;
+            bottom: 20px;
             z-index: 10;
         }
         .selectBox{
@@ -55,9 +69,6 @@
         #clear{
             margin: 0 15px;
         }
-        /* #undoDel{
-            margin: 0 10px;
-        } */
     </style>
 </head>
 
@@ -84,20 +95,39 @@
                     <span class="badge bg-dark">+{{ relics.level }}</span>
                 </div>
                 <ul v-for="(entry,index2) in relics.entry" class="list-group list-group-flush">
-                    <li class="list-group-item">{{ toChinese(entry[0],"entry") }} : {{ Number(entry[1].toFixed(2)) }}</li>
+                    <li class="list-group-item" @click="relicUpgrade(index,entry[0])">{{ toChinese(entry[0],"entry") }} : {{ Number(entry[1].toFixed(2)) }}
+                        <span class="badge bg-primary upgradeCheat" v-show="relics.level<20">+</span>
+                    </li>
                     <li class="list-group-item" v-if="relics.entry.length == 3 && index2 == 2">——</li>
                 </ul>
-                <div class="card-body">
-                    <button id="upgrade" @click="relicUpgrade(index)" class="btn btn-primary btn-sm" :disabled="relics.level >= 20">强化</button>
-                    <button id="deleteRelic" @click="deleteRelic(index)" class="btn btn-warning btn-sm float-end">删除</button>
+                <div class="card-body" style="text-align:center;">
+                    <button id="upgrade" @click="relicUpgrade(index)" class="btn btn-primary btn-sm float-start" :disabled="relics.level >= 20">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-square" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+                        </svg>
+                    </button>
+                    <button id="initRelic" @click="initRelic(index)" class="btn btn-success btn-sm" :disabled="relics.level==0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+                            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                            <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                        </svg>
+                    </button>
+                    <button id="deleteRelic" @click="deleteRelic(index)" class="btn btn-danger btn-sm float-end">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="buttonBox">
-            <button id="start" @click="start" class="btn btn-primary">新增数据</button>
-            <button id="clear" @click="relicClear" class="btn btn-danger">清除数据</button>
-            <button id="undoDel" @click="undoDel" class="btn btn-success">撤销删除</button>
-        </div>
+        <footer>
+            <div class="buttonBox">
+                <button id="start" @click="start" class="btn btn-primary">新增数据</button>
+                <button id="clear" @click="relicClear" class="btn btn-danger">清除数据</button>
+                <button id="undoDel" @click="undoDel" class="btn btn-success">撤销删除</button>
+            </div>
+        </footer>
     </div>
 
     <!-- <script type="module">
@@ -133,8 +163,13 @@
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
-                relicUpgrade(index){
-                    relicsSim.upgrade(index);
+                relicUpgrade(index,entry=""){
+                    relicsSim.upgrade(index,entry);
+                    this.relicsList = [...relicsSim.result];
+                    this.localRecord(this.relicsList);
+                },
+                initRelic(index){
+                    relicsSim.reset(index);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
@@ -152,9 +187,6 @@
                     relicsSim.undoDel();
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
-                },
-                sortRelic(){
-
                 },
                 localRecord(record){
                     if(!window.localStorage){

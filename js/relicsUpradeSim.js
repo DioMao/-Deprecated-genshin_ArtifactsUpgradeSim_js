@@ -56,6 +56,7 @@ RelicsFunction.prototype.random = function () {
         part: "none",
         mainEntry: "none",
         entry: [],
+        initEntry: '',
         upgradeHistory: []
     }
     // 随机位置
@@ -84,6 +85,8 @@ RelicsFunction.prototype.random = function () {
         let newEntry = randomRate(relicEntry, relicEntryRate)
         newRelics.entry[3] = [newEntry, randomEntryValue(newEntry)];
     }
+    // 保存初始状态
+    newRelics.initEntry = JSON.stringify(newRelics.entry);
     // 保存结果
     this.result.push(newRelics);
     this.count++;
@@ -95,8 +98,9 @@ RelicsFunction.prototype.random = function () {
 /**
  * 升级强化
  * @param {number} __index 序号
+ * @param {string} __entry 指定强化的词条（默认空值）
  */
-RelicsFunction.prototype.upgrade = function (__index) {
+RelicsFunction.prototype.upgrade = function (__index,__entry = "") {
     if (__index >= this.result.length || __index < 0) return false;
     let currentRelic = this.result[__index],
         currentEntry = [],
@@ -125,10 +129,22 @@ RelicsFunction.prototype.upgrade = function (__index) {
         this.result[__index].upgradeHistory.push([addEntry, addRate]);
         console.log("Upgrade success,new entry is " + addEntry + " + " + addRate);
     } else {
-        // 升级随机词条
-        let upIndex = Math.floor(Math.random() * currentRelic.entry.length),
-            // 被强化词条
-            upEntry = currentRelic.entry[upIndex][0],
+        let upIndex = 0,
+            upEntry = "",
+            upRate = 0;
+            // 优先升级自选词条
+            if(__entry != "" && entryList.indexOf(__entry) >= 0){
+                for(let i = 0; i < currentRelic.entry.length; i++){
+                    if(__entry == currentRelic.entry[i][0]){
+                        upIndex = i;
+                        upEntry = currentRelic.entry[i][0];
+                    }
+                }
+            }else{
+                // 升级随机词条
+                upIndex = Math.floor(Math.random() * currentRelic.entry.length);
+                upEntry = currentRelic.entry[upIndex][0];
+            }
             upRate = randomEntryValue(upEntry);
         console.log("Upgrade success," + upEntry + " + " + upRate);
         this.result[__index].entry[upIndex][1] += upRate;
@@ -136,7 +152,17 @@ RelicsFunction.prototype.upgrade = function (__index) {
     }
     // 增加等级
     this.result[__index].level += 4;
-    // console.log(this.result);
+}
+
+/**
+ * 圣遗物重置初始状态
+ * @param {number} __index 序号
+ */
+RelicsFunction.prototype.reset = function(__index){
+    this.result[__index].entry.length = 0;
+    this.result[__index].upgradeHistory.length = 0;
+    this.result[__index].entry = JSON.parse(this.result[__index].initEntry);
+    this.result[__index].level = 0;
 }
 
 /**
