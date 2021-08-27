@@ -133,11 +133,9 @@
                             <span class="visually-hidden">Toggle Dropdown</span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">自选属性</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#cusRelic">自选属性</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Separated link</a></li>
+                            <li><a class="dropdown-item" href="#">敬请期待</a></li>
                         </ul>
                     </div>
                     <button id="clear" @click="relicClear" class="btn btn-danger">清除数据</button>
@@ -156,6 +154,39 @@
             </footer>
         </div>
         <!-- /Relics -->
+        <!-- Modal -->
+        <div class="modal fade" id="cusRelic" tabindex="-1" data-bs-backdrop="static" aria-labelledby="cusRelicLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="cusRelicLabel">自选圣遗物</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="cusCloseSwitch" v-model="cusCloseSwitch" checked>
+                            <label class="form-check-label" for="cusCloseSwitch">生成后关闭此窗口</label>
+                        </div>
+                        <label for="cutRelicPart" class="form-label">位置</label>
+                        <select id="cutRelicPart" class="form-select form-select-sm mb-3" v-model="cusPart">
+                            <option value="feather">死之羽</option>
+                            <option value="flower">生之花</option>
+                            <option value="hourglass">时之沙</option>
+                            <option value="hat">理之冠</option>
+                            <option value="cup">空之杯</option>
+                        </select>
+                        <label class="form-label" v-show="cusPart!='default'&&cusPart!=''">主属性</label>
+                        <select class="form-select form-select-sm mb-3" v-if="cusPart!='default'&&cusPart!=''" v-model="cusMainEntry">
+                            <option v-for="partModel in cusEntryList[cusPart]" :value="partModel">{{ toChinese(partModel,"mainEntry") }}</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" @click="cusCreatRelic" :data-bs-dismiss="cusCloseSwitch?'modal':''">确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- <script type="module">
@@ -167,7 +198,13 @@
                 return {
                     relicsList: [],
                     parts: [],
-                    selected: "default"
+                    selected: "default",
+                    cusCloseSwitch: true,
+                    cusPart: "",
+                    cusMainEntry: "",
+                    cusEntry: [],
+                    cusEntryRate: [],
+                    cusEntryList: {}
                 }
             },
             created(){
@@ -182,12 +219,18 @@
                         this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
                     };
                 }
+                this.cusEntryList = cusEntryList;
                 this.parts = parts;
                 console.log("Vue is runnning.");
             },
             methods:{
                 start(){
                     relicsSim.creatRelic();
+                    this.relicsList = [...relicsSim.result];
+                    this.localRecord(this.relicsList);
+                },
+                cusCreatRelic(){
+                    relicsSim.creatRelic(this.cusPart,this.cusMainEntry,this.cusEntry,this.cusEntryRate);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
