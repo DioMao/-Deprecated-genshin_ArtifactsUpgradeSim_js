@@ -7,7 +7,7 @@ const relicsSim = new RelicsFunction();
 // 词缀条目
 const entryList = ["critRate", "critDMG", "ATK", "ATKPer", "def", "defPer", "HP", "HPPer", "energyRecharge", "elementMastery"],
     entryListCh = ["暴击率%", "暴击伤害%", "攻击", "攻击%", "防御", "防御%", "生命", "生命%", "充能效率%", "元素精通"],
-    entryListRate = [0.3, 0.3, 0.75, 0.5, 0.75, 0.5, 0.75, 0.5, 0.3, 0.3],
+    entryProbability = [0.3, 0.3, 0.75, 0.5, 0.75, 0.5, 0.75, 0.5, 0.3, 0.3],
     entryValue = {
         "critRate": [2.7, 3.1, 3.5, 3.9],
         "critDMG": [5.4, 6.2, 7, 7.8],
@@ -34,10 +34,18 @@ const feather = ["ATK"],
     mainEntryList = ["ATK", "HP", "critRate", "energyRecharge", "HPRes", "critDMG", "ATKPer", "defPer", "HPPer", "elementMastery", "water", "fire", "thunder", "stone", "wind", "ice", "Physical"],
     mainEntryListCh = ["攻击", "生命", "暴击率%", "充能效率%", "治疗加成", "暴击伤害%", "攻击%", "防御%", "生命%", "元素精通", "水元素伤害", "火元素伤害", "雷元素伤害", "岩元素伤害", "风元素伤害", "冰元素伤害", "物理伤害"];
 
+const cusEntryList = {
+    "feather": feather,
+    "flower": flower,
+    "hourglass": hourglass,
+    "hat": hat,
+    "cup": cup
+};
+
 // 部件主词条概率
 const hourglassRate = [0.26, 0.26, 0.26, 0.1, 0.1],
     hatRate = [0.1, 0.1, 0.22, 0.22, 0.22, 0.04, 0.1],
-    cupRate = [0.21, 0.21, 0.21, 0.025, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05]
+    cupRate = [0.21, 0.21, 0.21, 0.025, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05];
 
 /**
  * 构造函数
@@ -88,13 +96,13 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
             if (__entryRate.length == 0 || typeof (cusEntryRate) != "number" || entryValue[cusEntry].indexOf(cusEntryRate) == -1) {
                 cusEntryRate = randomEntryValue(__entry);
             }
-            newRelics.entry.push([cusEntry,cusEntryRate]);
+            newRelics.entry.push([cusEntry, cusEntryRate]);
         }
-    }else{
+    } else {
         let relicEntry = [],
             relicEntryRate = [];
         for (let i = 0; i < entryList.length; i++) {
-            entryList[i] == newRelics.mainEntry ? null : (relicEntry.push(entryList[i]), relicEntryRate.push(entryListRate[i]));
+            entryList[i] == newRelics.mainEntry ? null : (relicEntry.push(entryList[i]), relicEntryRate.push(entryProbability[i]));
         }
         // 随机词条
         for (let i = 0; i < 3; i++) {
@@ -149,7 +157,7 @@ RelicsFunction.prototype.upgrade = function (__index, __entry = "") {
         for (let i = 0; i < entryList.length; i++) {
             if (currentEntry.indexOf(entryList[i]) < 0) {
                 currentEntryList.push(entryList[i]);
-                currentEntryRate.push(entryListRate[i]);
+                currentEntryRate.push(entryProbability[i]);
             }
         }
         let addEntry = randomRate(currentEntryList, currentEntryRate),
