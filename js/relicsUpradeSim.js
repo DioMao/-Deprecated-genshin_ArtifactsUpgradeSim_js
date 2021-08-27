@@ -2,10 +2,11 @@
 // export {relicsSim,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh};
 
 const relicsSim = new RelicsFunction();
+// relicsSim.creatRelic("cup","fire",["ATKPer","critRate","critDMG","elementMastery"],[5.8,3.9,7.8,23]);
 
 // 词缀条目
 const entryList = ["critRate", "critDMG", "ATK", "ATKPer", "def", "defPer", "HP", "HPPer", "energyRecharge", "elementMastery"],
-    entryListCh = ["暴击率%","暴击伤害%","攻击","攻击%","防御","防御%","生命","生命%","充能效率%","元素精通"],
+    entryListCh = ["暴击率%", "暴击伤害%", "攻击", "攻击%", "防御", "防御%", "生命", "生命%", "充能效率%", "元素精通"],
     entryListRate = [0.3, 0.3, 0.75, 0.5, 0.75, 0.5, 0.75, 0.5, 0.3, 0.3],
     entryValue = {
         "critRate": [2.7, 3.1, 3.5, 3.9],
@@ -36,7 +37,7 @@ const feather = ["ATK"],
 // 部件主词条概率
 const hourglassRate = [0.26, 0.26, 0.26, 0.1, 0.1],
     hatRate = [0.1, 0.1, 0.22, 0.22, 0.22, 0.04, 0.1],
-    cupRate = [0.21, 0.21, 0.21, 0.025, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,0.05]
+    cupRate = [0.21, 0.21, 0.21, 0.025, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05]
 
 /**
  * 构造函数
@@ -49,8 +50,15 @@ function RelicsFunction() {
     this.deleteHistory = [];
 };
 
-// 初始化
-RelicsFunction.prototype.random = function () {
+/**
+ * 生成初始数据
+ * @param {string} __part 指定位置，可为空
+ * @param {string} __main 指定主词条，可为空
+ * @param {Array} __entryArr 指定词条（3-4条），可为空
+ * @param {Array} __entryRate 副词条数值（对应自选副词条），可为空
+ * @returns {object} 对象newRelics
+ */
+RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entry = [], __entryRate = []) {
     let newRelics = {
         level: 0,
         part: "none",
@@ -59,31 +67,52 @@ RelicsFunction.prototype.random = function () {
         initEntry: '',
         upgradeHistory: []
     }
-    // 随机位置
-    newRelics.part = parts[Math.floor((Math.random() * parts.length))];
-    // 随机主属性
-    newRelics.mainEntry = chooseMainEntry(newRelics.part);
-    let relicEntry = [],
-        relicEntryRate = [];
-    for (let i = 0; i < entryList.length; i++) {
-        entryList[i] == newRelics.mainEntry ? null : (relicEntry.push(entryList[i]), relicEntryRate.push(entryListRate[i]));
+    // 自选或随机位置
+    if (typeof (__part) == "string" && parts.indexOf(__part) != -1) {
+        newRelics.part = __part;
+    } else {
+        newRelics.part = parts[Math.floor((Math.random() * parts.length))];
     }
-    // 随机词条
-    for (let i = 0; i < 3; i++) {
-        //临时词条库
-        let newEntry = randomRate(relicEntry, relicEntryRate),
-            newEntryRate = randomEntryValue(newEntry),
-            index = relicEntry.indexOf(newEntry);
-        // 从临时词条库中移除已有词条，避免重复
-        relicEntry.splice(index, 1);
-        relicEntryRate.splice(index, 1);
-        // 写入词条数据
-        newRelics.entry[i] = [newEntry, newEntryRate];
+    // 自选或随机主属性
+    if (typeof (__main) == "string" && mainEntryList.indexOf(__main) != -1 && mainEntryVerify(newRelics.part, __main)) {
+        newRelics.mainEntry = __main;
+    } else {
+        newRelics.mainEntry = randomMainEntry(newRelics.part);
     }
-    // 是否拥有初始四词条
-    if (Math.random() < 0.2) {
-        let newEntry = randomRate(relicEntry, relicEntryRate)
-        newRelics.entry[3] = [newEntry, randomEntryValue(newEntry)];
+    // 自选副词条
+    if (__entry.length == 3 || __entry.length == 4 && entryVerify(newRelics.mainEntry, __entry)) {
+        for (let i = 0; i < __entry.length; i++) {
+            let cusEntry = __entry[i],
+                cusEntryRate = __entryRate[i];
+            // 判断自选副词条数值是否合规
+            if (__entryRate.length == 0 || typeof (cusEntryRate) != "number" || entryValue[cusEntry].indexOf(cusEntryRate) == -1) {
+                cusEntryRate = randomEntryValue(__entry);
+            }
+            newRelics.entry.push([cusEntry,cusEntryRate]);
+        }
+    }else{
+        let relicEntry = [],
+            relicEntryRate = [];
+        for (let i = 0; i < entryList.length; i++) {
+            entryList[i] == newRelics.mainEntry ? null : (relicEntry.push(entryList[i]), relicEntryRate.push(entryListRate[i]));
+        }
+        // 随机词条
+        for (let i = 0; i < 3; i++) {
+            //临时词条库
+            let newEntry = randomRate(relicEntry, relicEntryRate),
+                newEntryRate = randomEntryValue(newEntry),
+                index = relicEntry.indexOf(newEntry);
+            // 从临时词条库中移除已有词条，避免重复
+            relicEntry.splice(index, 1);
+            relicEntryRate.splice(index, 1);
+            // 写入词条数据
+            newRelics.entry[i] = [newEntry, newEntryRate];
+        }
+        // 是否拥有初始四词条
+        if (Math.random() < 0.2) {
+            let newEntry = randomRate(relicEntry, relicEntryRate);
+            newRelics.entry[3] = [newEntry, randomEntryValue(newEntry)];
+        }
     }
     // 保存初始状态
     newRelics.initEntry = JSON.stringify(newRelics.entry);
@@ -100,7 +129,7 @@ RelicsFunction.prototype.random = function () {
  * @param {number} __index 序号
  * @param {string} __entry 指定强化的词条（默认空值）
  */
-RelicsFunction.prototype.upgrade = function (__index,__entry = "") {
+RelicsFunction.prototype.upgrade = function (__index, __entry = "") {
     if (__index >= this.result.length || __index < 0) return false;
     let currentRelic = this.result[__index],
         currentEntry = [],
@@ -132,23 +161,23 @@ RelicsFunction.prototype.upgrade = function (__index,__entry = "") {
         let upIndex = 0,
             upEntry = "",
             upRate = 0;
-            // 优先升级自选词条
-            if(__entry != "" && entryList.indexOf(__entry) >= 0){
-                for(let i = 0; i < currentRelic.entry.length; i++){
-                    if(__entry == currentRelic.entry[i][0]){
-                        upIndex = i;
-                        upEntry = currentRelic.entry[i][0];
-                    }
+        // 优先升级自选词条
+        if (__entry != "" && entryList.indexOf(__entry) >= 0) {
+            for (let i = 0; i < currentRelic.entry.length; i++) {
+                if (__entry == currentRelic.entry[i][0]) {
+                    upIndex = i;
+                    upEntry = currentRelic.entry[i][0];
                 }
-            }else{
-                // 升级随机词条
-                upIndex = Math.floor(Math.random() * currentRelic.entry.length);
-                upEntry = currentRelic.entry[upIndex][0];
             }
-            upRate = randomEntryValue(upEntry);
+        } else {
+            // 升级随机词条
+            upIndex = Math.floor(Math.random() * currentRelic.entry.length);
+            upEntry = currentRelic.entry[upIndex][0];
+        }
+        upRate = randomEntryValue(upEntry);
         console.log("Upgrade success," + upEntry + " + " + upRate);
         this.result[__index].entry[upIndex][1] += upRate;
-        this.result[__index].upgradeHistory.push([upEntry,upRate]);
+        this.result[__index].upgradeHistory.push([upEntry, upRate]);
     }
     // 增加等级
     this.result[__index].level += 4;
@@ -158,38 +187,47 @@ RelicsFunction.prototype.upgrade = function (__index,__entry = "") {
  * 圣遗物重置初始状态
  * @param {number} __index 序号
  */
-RelicsFunction.prototype.reset = function(__index){
+RelicsFunction.prototype.reset = function (__index) {
     this.result[__index].entry.length = 0;
-    this.result[__index].upgradeHistory.length = 0;
     this.result[__index].entry = JSON.parse(this.result[__index].initEntry);
+    this.result[__index].upgradeHistory.length = 0;
     this.result[__index].level = 0;
+}
+
+/**
+ * 重置全部圣遗物状态
+ */
+RelicsFunction.prototype.resetAll = function () {
+    for (let i = 0; i < this.result.length; i++) {
+        this.reset(i);
+    }
 }
 
 /**
  * 删除指定数据
  * @param {number} __del 要删除的遗物序号
  */
-RelicsFunction.prototype.deleteOne = function(__del){
-    this.deleteHistory.push(this.result.splice(__del,1)[0]);
+RelicsFunction.prototype.deleteOne = function (__del) {
+    this.deleteHistory.push(this.result.splice(__del, 1)[0]);
 }
 
 /**
  * 批量删除指定数据
  * @param {Array} __delArr 要删除的遗物序号（数组）
  */
-RelicsFunction.prototype.batchDelete = function(__delArr){
-    __delArr.sort((a,b) => a-b);
-    for(let i = __delArr.length - 1;i >= 0 ;i--){
-        this.result.splice(__delArr[i],1)
+RelicsFunction.prototype.batchDelete = function (__delArr) {
+    __delArr.sort((a, b) => a - b);
+    for (let i = __delArr.length - 1; i >= 0; i--) {
+        this.result.splice(__delArr[i], 1)
     }
 }
 
 /**
  * 清空数据
  */
-RelicsFunction.prototype.clearAll = function(){
+RelicsFunction.prototype.clearAll = function () {
     // 备份原数据
-    if(this.backup.length != 0) this.backup.length = 0;
+    if (this.backup.length != 0) this.backup.length = 0;
     this.backup = JSON.parse(JSON.stringify(this.result));
     this.result.length = 0;
 }
@@ -197,8 +235,8 @@ RelicsFunction.prototype.clearAll = function(){
 /**
  * 撤销删除（对deleteOne删除的数据生效）
  */
-RelicsFunction.prototype.undoDel = function(){
-    if(this.deleteHistory.length == 0){
+RelicsFunction.prototype.undoDel = function () {
+    if (this.deleteHistory.length == 0) {
         console.log("Undo false, history not found.");
         return false;
     }
@@ -233,29 +271,86 @@ function randomRate(__arr1, __arr2) {
 }
 
 /**
+ * 主词条合规验证
+ * @param {string} __part 位置
+ * @param {string} __main 主词条
+ * @returns {boolean} true/false
+ */
+function mainEntryVerify(__part, __main) {
+    if (typeof (__part) != "string" || typeof (__main) != "string") return false;
+    if (parts.indexOf(__part) != -1 && mainEntryList.indexOf(__main) != -1) {
+        switch (__part) {
+            case "feather":
+                if (__main == "ATK") {
+                    return true;
+                } else {
+                    return false;
+                };
+            case "flower":
+                if (__main == "HP") {
+                    return true;
+                } else {
+                    return false;
+                };
+            case "hourglass":
+                if (hourglass.indexOf(__main) != -1) {
+                    return true;
+                } else {
+                    return false;
+                };
+            case "hat":
+                if (hat.indexOf(__main) != -1) {
+                    return true;
+                } else {
+                    return false;
+                };
+            case "cup":
+                if (cup.indexOf(__main) != -1) {
+                    return true;
+                } else {
+                    return false;
+                };
+            default:
+                return false;
+        }
+    }
+    return false;
+}
+
+/**
  * 随机主词条
  * @param {string} __part 位置
  */
-function chooseMainEntry(__part) {
+function randomMainEntry(__part) {
     switch (__part) {
         case "feather":
             return "ATK";
-            break;
         case "flower":
             return "HP";
-            break;
         case "hourglass":
             return randomRate(hourglass, hourglassRate);
-            break;
         case "hat":
             return randomRate(hat, hatRate);
-            break;
         case "cup":
             return randomRate(cup, cupRate);
-            break;
         default:
-            console.log("Error! -chooseMainEntry-");
+            console.log("Error! -randomMainEntry-");
     }
+}
+
+/**
+ * 自选副词条合规验证
+ * @param {string} __mainEntry 
+ * @param {Array} __entryArr 
+ * @returns 
+ */
+function entryVerify(__mainEntry, __entryArr) {
+    for (let i = 0; i < __entryArr.length; i++) {
+        if (__mainEntry == __entryArr[i] || entryList.indexOf(__entryArr[i]) == -1) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /** 
