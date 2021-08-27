@@ -163,26 +163,32 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <!-- 自选位置 -->
+                        <label for="cutRelicPart" class="form-label">位置</label>
+                        <select id="cutRelicPart" class="form-select form-select-sm mb-3" v-model="cusPart">
+                            <option v-for="part in parts" :value="part">{{ toChinese(part,"parts") }}</option>
+                        </select>
+                        <!-- 自选主属性 -->
+                        <label class="form-label" v-show="cusPart!='default'&&cusPart!=''">主属性</label>
+                        <select class="form-select form-select-sm mb-3" v-if="cusPart!='default'&&cusPart!=''" v-model="cusMainEntry">
+                            <option v-for="partModal in cusEntryList[cusPart]" :value="partModal">{{ toChinese(partModal,"mainEntry") }}</option>
+                        </select>
+                        <!-- 自选副词条 -->
+                        <label class="form-label" v-show="cusPart!='default'&&cusMainEntry!=''">副词条选择（选择3-4项时生效）</label>
+                        <div class="form-check" v-for="entry in entryList" v-show="cusPart!='default'&&cusMainEntry!=''&&cusMainEntry!=entry">
+                            <input @click="addCusEntry(entry)" class="form-check-input" type="checkbox" :value="entry" :id="entry+'Check'" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
+                            <label class="form-check-label" :for="entry+'Check'">
+                              {{ toChinese(entry,"entry") }}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="cusCloseSwitch" v-model="cusCloseSwitch" checked>
                             <label class="form-check-label" for="cusCloseSwitch">生成后关闭此窗口</label>
                         </div>
-                        <label for="cutRelicPart" class="form-label">位置</label>
-                        <select id="cutRelicPart" class="form-select form-select-sm mb-3" v-model="cusPart">
-                            <option value="feather">死之羽</option>
-                            <option value="flower">生之花</option>
-                            <option value="hourglass">时之沙</option>
-                            <option value="hat">理之冠</option>
-                            <option value="cup">空之杯</option>
-                        </select>
-                        <label class="form-label" v-show="cusPart!='default'&&cusPart!=''">主属性</label>
-                        <select class="form-select form-select-sm mb-3" v-if="cusPart!='default'&&cusPart!=''" v-model="cusMainEntry">
-                            <option v-for="partModel in cusEntryList[cusPart]" :value="partModel">{{ toChinese(partModel,"mainEntry") }}</option>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" @click="cusCreatRelic" :data-bs-dismiss="cusCloseSwitch?'modal':''">确认</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" @click="cusCreatRelic" :data-bs-dismiss="cusCloseSwitch?'modal':null">确认</button>
                     </div>
                 </div>
             </div>
@@ -198,7 +204,9 @@
                 return {
                     relicsList: [],
                     parts: [],
+                    entryList: [],
                     selected: "default",
+                    clearCheck: false,
                     cusCloseSwitch: true,
                     cusPart: "",
                     cusMainEntry: "",
@@ -219,8 +227,9 @@
                         this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
                     };
                 }
-                this.cusEntryList = cusEntryList;
                 this.parts = parts;
+                this.entryList = entryList;
+                this.cusEntryList = cusEntryList;
                 console.log("Vue is runnning.");
             },
             methods:{
@@ -271,6 +280,11 @@
                     }else{
                         localStorage.localRecord = JSON.stringify(record);
                     }
+                },
+                addCusEntry(entry){
+                    this.cusEntry.indexOf(entry) == -1 
+                    ? this.cusEntry.push(entry) 
+                    : this.cusEntry.splice(this.cusEntry.indexOf(entry),1);
                 },
                 toChinese(word,type){
                     if(type == "entry"){
