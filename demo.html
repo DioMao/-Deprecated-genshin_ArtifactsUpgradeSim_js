@@ -165,21 +165,24 @@
                     <div class="modal-body">
                         <!-- 自选位置 -->
                         <label for="cutRelicPart" class="form-label">位置</label>
-                        <select id="cutRelicPart" class="form-select form-select-sm mb-3" v-model="cusPart">
+                        <select id="cutRelicPart" class="form-select form-select-sm mb-3" v-model="cusPart" @change="cusEntry.length=0">
                             <option v-for="part in parts" :value="part">{{ toChinese(part,"parts") }}</option>
                         </select>
                         <!-- 自选主属性 -->
                         <label class="form-label" v-show="cusPart!='default'&&cusPart!=''">主属性</label>
-                        <select class="form-select form-select-sm mb-3" v-if="cusPart!='default'&&cusPart!=''" v-model="cusMainEntry">
+                        <select class="form-select form-select-sm mb-3" v-if="cusPart!='default'&&cusPart!=''" v-model="cusMainEntry" @change="cusEntry.length=0">
                             <option v-for="partModal in cusEntryList[cusPart]" :value="partModal">{{ toChinese(partModal,"mainEntry") }}</option>
                         </select>
                         <!-- 自选副词条 -->
                         <label class="form-label" v-show="cusPart!='default'&&cusMainEntry!=''">副词条选择（选择3-4项时生效）</label>
                         <div class="form-check" v-for="entry in entryList" v-show="cusPart!='default'&&cusMainEntry!=''&&cusMainEntry!=entry">
-                            <input @click="addCusEntry(entry)" class="form-check-input" type="checkbox" :value="entry" :id="entry+'Check'" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
+                            <input class="form-check-input" v-model="cusEntry" type="checkbox" :value="entry" :id="entry+'Check'" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
                             <label class="form-check-label" :for="entry+'Check'">
                               {{ toChinese(entry,"entry") }}
                             </label>
+                            <select class="form-select form-select-sm mt-1 mb-1 col-md-6 ms-auto" v-model="cusEntryRate[entry]" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
+                                <option v-for="entryValueModal in entryValue[entry]" :value="entryValueModal">{{ entryValueModal }}</option>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -205,14 +208,16 @@
                     relicsList: [],
                     parts: [],
                     entryList: [],
+                    clearAll: '',
                     selected: "default",
                     clearCheck: false,
                     cusCloseSwitch: true,
                     cusPart: "",
                     cusMainEntry: "",
                     cusEntry: [],
-                    cusEntryRate: [],
-                    cusEntryList: {}
+                    cusEntryRate: {},
+                    cusEntryList: {},
+                    entryValue: {}
                 }
             },
             created(){
@@ -230,6 +235,11 @@
                 this.parts = parts;
                 this.entryList = entryList;
                 this.cusEntryList = cusEntryList;
+                this.entryValue = entryValue;
+                // 初始化自选副词条为最大值
+                for(let i in entryValue){
+                    this.cusEntryRate[i] = entryValue[i][entryValue[i].length-1];
+                }
                 console.log("Vue is runnning.");
             },
             methods:{
@@ -238,41 +248,55 @@
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                // 自选圣遗物
                 cusCreatRelic(){
-                    relicsSim.creatRelic(this.cusPart,this.cusMainEntry,this.cusEntry,this.cusEntryRate);
+                    let cusEntryValue = [],
+                    cusEntry = [];
+                    for(let i= 0; i < this.cusEntry.length; i++){
+                        cusEntry.push(this.cusEntry[i]);
+                        cusEntryValue.push(this.cusEntryRate[cusEntry[i]]);
+                    }
+                    relicsSim.creatRelic(this.cusPart,this.cusMainEntry,cusEntry,cusEntryValue);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                // 圣遗物升级
                 relicUpgrade(index,entry=""){
                     relicsSim.upgrade(index,entry);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                // 初始化圣遗物
                 initRelic(index){
                     relicsSim.reset(index);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                // 清除结果列表
                 relicClear(){
                     relicsSim.clearAll();
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                // 删除圣遗物
                 deleteRelic(index){
                     relicsSim.deleteOne(index);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                // 撤销删除
                 undoDel(){
                     relicsSim.undoDel();
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                // 初始化全部圣遗物
                 resetAll(){
                     relicsSim.resetAll();
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                // 结果保存到localstorage
                 localRecord(record){
                     if(!window.localStorage){
                         alert("浏览器不支持localstorage");
@@ -281,11 +305,7 @@
                         localStorage.localRecord = JSON.stringify(record);
                     }
                 },
-                addCusEntry(entry){
-                    this.cusEntry.indexOf(entry) == -1 
-                    ? this.cusEntry.push(entry) 
-                    : this.cusEntry.splice(this.cusEntry.indexOf(entry),1);
-                },
+                // 转换为中文
                 toChinese(word,type){
                     if(type == "entry"){
                         return entryListCh[entryList.indexOf(word)]
