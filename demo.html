@@ -256,7 +256,14 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        假装这里有设置
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="testSwitch" v-model="userSetting['test']" @change="changeSetting">
+                            <label class="form-check-label" for="testSwitch">test</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="testSwitch2" v-model="userSetting['test2']" @change="changeSetting">
+                            <label class="form-check-label" for="testSwitch2">test</label>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
@@ -290,7 +297,10 @@
                     cusEntryRate: {},
                     cusEntryList: {},
                     entryValue: {},
-                    userSetting:{}
+                    userSetting:{
+                        "test": true,
+                        "test2": false
+                    }
                 }
             },
             created(){
@@ -303,6 +313,11 @@
                     }else if(localStorage.localRecord != '' || localStorage.localRecord != []){
                         relicsSim.result = JSON.parse(localStorage.getItem("localRecord"));
                         this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
+                    };
+                    if(localStorage.userSetting == undefined){
+                        localStorage.userSetting = '';
+                    }else if(localStorage.userSetting != '' || localStorage.userSetting != {}){
+                        this.userSetting = JSON.parse(localStorage.getItem("userSetting"));
                     };
                 }
                 this.parts = parts;
@@ -383,6 +398,14 @@
                         return false;
                     }else{
                         localStorage.localRecord = JSON.stringify(record);
+                    }
+                },
+                changeSetting(){
+                    if(!window.localStorage){
+                        alert("浏览器不支持localstorage");
+                        return false;
+                    }else{
+                        localStorage.userSetting = JSON.stringify(this.userSetting);
                     }
                 },
                 // 转换为中文
