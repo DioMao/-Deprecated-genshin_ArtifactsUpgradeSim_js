@@ -14,6 +14,23 @@
         #vueApp{
             width: 100%;
         }
+        #loading{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 99;
+            background-color: #fff;
+        }
+        #loading .loading-box{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-top: -12px;
+            margin-left: -12px;
+        }
+        .hide{
+            display: none;
+        }
         .navbar{
             width: 100%;
             position: fixed;
@@ -95,6 +112,13 @@
 
 <body>
     <div id="vueApp">
+        <!-- loading -->
+        <div id="loading" :class="isLoad?'hide':''">
+            <div class="spinner-border loading-box" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <!-- /loading -->
         <!-- nav -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
             <div class="container-fluid">
@@ -108,7 +132,6 @@
             </div>
         </nav>
         <!-- /nav -->
-
         <!-- Relics -->
         <div>
             <div class="container-fluid demo-container">
@@ -252,6 +275,7 @@
         const app = Vue.createApp({
             data() {
                 return {
+                    isLoad: false,
                     showIndex: -1,
                     relicsList: [],
                     parts: [],
@@ -290,6 +314,11 @@
                     this.cusEntryRate[i] = entryValue[i][entryValue[i].length-1];
                 }
                 console.log("Vue is runnning.");
+            },
+            mounted(){
+                this.$nextTick(function(){
+                    this.isLoad = true;
+                })
             },
             methods:{
                 start(){
