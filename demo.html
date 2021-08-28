@@ -37,10 +37,30 @@
             width: 10rem;
             height: 323px;
             font-size: 0.9rem;
+            transition: ease 0.2s all;
         }
         @media screen and (max-width:480px) {
             .relicsBox{
                 width: calc(50% - 20px);
+            }
+        }
+        @media screen and (max-width:979px){
+            .relicShowBox{
+                display: none;
+            }
+        }
+        @media screen and (min-width:980px){
+            .relicShowBox{
+                position: fixed;
+                margin-top: 20px;
+                right: 0;
+                width: 320px;
+                height: 100%;
+            }
+            .demo-container{
+                position: absolute;
+                left: 0;
+                width: calc(100% - 320px);
             }
         }
         .upgradeCheat{
@@ -92,7 +112,7 @@
         <!-- Relics -->
         <div>
             <div class="container-fluid demo-container">
-                <div v-for="(relics,index) in relicsList" class="relicsBox card shadow-sm rounded" v-show="selected=='default' || selected == relics.part">
+                <div v-for="(relics,index) in relicsList" :class="'relicsBox card rounded '+ (index==showIndex?'shadow':'shadow-sm')" v-show="selected=='default' || selected == relics.part" @click="showIndex=index">
                     <div class="card-body">
                         <div class="card-text fs-6 fw-bolder">{{ toChinese(relics.part,"parts") }}</div>
                         <div class="card-text fw-bold lh-lg">主属性:{{ toChinese(relics.mainEntry,"mainEntry") }}</div>
@@ -124,6 +144,12 @@
                         </button>
                     </div>
                 </div>
+                <div class="relicShowBox">
+                    <p>这里准备放个圣遗物展示界面</p>
+                    <div v-for="(value,key) in relicsList[showIndex]">
+                        <div>{{ key }} : {{ value }}</div>
+                    </div>
+                </div>
             </div>
             <footer>
                 <div class="buttonBox">
@@ -146,7 +172,8 @@
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                           <li><a class="dropdown-item" href="#" @click="undoDel">撤销删除</a></li>
                           <li><a class="dropdown-item" href="#" @click="resetAll">全部重置</a></li>
-                          <li><a class="dropdown-item" href="#">Something else here</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#userSet">设置</a></li>
                         </ul>
                     </div>
                     <!-- <button id="undoDel" @click="undoDel" class="btn btn-success">撤销删除</button> -->
@@ -154,27 +181,27 @@
             </footer>
         </div>
         <!-- /Relics -->
-        <!-- Modal -->
+        <!-- cusModal -->
         <div class="modal fade" id="cusRelic" tabindex="-1" data-bs-backdrop="static" aria-labelledby="cusRelicLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <h5 class="modal-title" id="cusRelicLabel">自选圣遗物</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title" id="cusRelicLabel">自选圣遗物</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <!-- 自选位置 -->
-                        <label for="cutRelicPart" class="form-label">位置</label>
+                        <label for="cutRelicPart" class="form-label fw-bold">位置</label>
                         <select id="cutRelicPart" class="form-select form-select-sm mb-3" v-model="cusPart" @change="cusEntry.length=0">
                             <option v-for="part in parts" :value="part">{{ toChinese(part,"parts") }}</option>
                         </select>
                         <!-- 自选主属性 -->
-                        <label class="form-label" v-show="cusPart!='default'&&cusPart!=''">主属性</label>
+                        <label class="form-label fw-bold" v-show="cusPart!='default'&&cusPart!=''">主属性</label>
                         <select class="form-select form-select-sm mb-3" v-if="cusPart!='default'&&cusPart!=''" v-model="cusMainEntry" @change="cusEntry.length=0">
                             <option v-for="partModal in cusEntryList[cusPart]" :value="partModal">{{ toChinese(partModal,"mainEntry") }}</option>
                         </select>
                         <!-- 自选副词条 -->
-                        <label class="form-label" v-show="cusPart!='default'&&cusMainEntry!=''">副词条选择（选择3-4项时生效）</label>
+                        <label class="form-label fw-bold" v-show="cusPart!='default'&&cusMainEntry!=''">副词条选择（选择3-4项时生效）</label>
                         <div class="form-check" v-for="entry in entryList" v-show="cusPart!='default'&&cusMainEntry!=''&&cusMainEntry!=entry">
                             <input class="form-check-input" v-model="cusEntry" type="checkbox" :value="entry" :id="entry+'Check'" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
                             <label class="form-check-label" :for="entry+'Check'">
@@ -196,6 +223,26 @@
                 </div>
             </div>
         </div>
+        <!-- /cusModal -->
+        <!-- userSetting -->
+        <div class="modal fade" id="userSet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="cusRelicLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cusRelicLabel">设置</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        假装这里有设置
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /userSetting -->
     </div>
 
     <!-- <script type="module">
@@ -205,6 +252,7 @@
         const app = Vue.createApp({
             data() {
                 return {
+                    showIndex: -1,
                     relicsList: [],
                     parts: [],
                     entryList: [],
@@ -217,7 +265,8 @@
                     cusEntry: [],
                     cusEntryRate: {},
                     cusEntryList: {},
-                    entryValue: {}
+                    entryValue: {},
+                    userSetting:{}
                 }
             },
             created(){
@@ -274,12 +323,14 @@
                 },
                 // 清除结果列表
                 relicClear(){
+                    this.showIndex = -1;
                     relicsSim.clearAll();
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
                 // 删除圣遗物
                 deleteRelic(index){
+                    this.showIndex = -1;
                     relicsSim.deleteOne(index);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
