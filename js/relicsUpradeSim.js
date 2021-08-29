@@ -136,8 +136,9 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
  * 升级强化
  * @param {number} __index 序号
  * @param {string} __entry 指定强化的词条（默认空值）
+ * @param {number} __upLevel 强化数值的级别(0-3，3最高)
  */
-RelicsFunction.prototype.upgrade = function (__index, __entry = "") {
+RelicsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = -1) {
     if (__index >= this.result.length || __index < 0) return false;
     let currentRelic = this.result[__index],
         currentEntry = [],
@@ -182,7 +183,11 @@ RelicsFunction.prototype.upgrade = function (__index, __entry = "") {
             upIndex = Math.floor(Math.random() * currentRelic.entry.length);
             upEntry = currentRelic.entry[upIndex][0];
         }
-        upRate = randomEntryValue(upEntry);
+        if(__upLevel != -1 && typeof(__upLevel) == "number" && Math.floor(__upLevel) < entryValue[upEntry].length){
+            upRate = entryValue[upEntry][Math.floor(__upLevel)];
+        }else{
+            upRate = randomEntryValue(upEntry);
+        }
         console.log("Upgrade success," + upEntry + " + " + upRate);
         this.result[__index].entry[upIndex][1] += upRate;
         this.result[__index].upgradeHistory.push([upEntry, upRate]);
@@ -287,40 +292,10 @@ function randomRate(__arr1, __arr2) {
 function mainEntryVerify(__part, __main) {
     if (typeof (__part) != "string" || typeof (__main) != "string") return false;
     if (parts.indexOf(__part) != -1 && mainEntryList.indexOf(__main) != -1) {
-        switch (__part) {
-            case "feather":
-                if (__main == "ATK") {
-                    return true;
-                } else {
-                    return false;
-                };
-            case "flower":
-                if (__main == "HP") {
-                    return true;
-                } else {
-                    return false;
-                };
-            case "hourglass":
-                if (hourglass.indexOf(__main) != -1) {
-                    return true;
-                } else {
-                    return false;
-                };
-            case "hat":
-                if (hat.indexOf(__main) != -1) {
-                    return true;
-                } else {
-                    return false;
-                };
-            case "cup":
-                if (cup.indexOf(__main) != -1) {
-                    return true;
-                } else {
-                    return false;
-                };
-            default:
-                return false;
+        if(cusEntryList[__part].indexOf(__main) != -1){
+            return true;
         }
+        return false;
     }
     return false;
 }
