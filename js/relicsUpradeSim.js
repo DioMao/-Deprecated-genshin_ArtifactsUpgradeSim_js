@@ -1,7 +1,13 @@
+/**
+ * relicsUpgradeSim v0.1.3
+ * Copyrigth 2021-2022 DioMao (https://github.com/DioMao/genshin_relicsUpgradeSim_js/graphs/contributors)
+ * Licensed under MIT (https://github.com/DioMao/genshin_relicsUpgradeSim_js/blob/main/LICENSE)
+ */
 "use strict";
 // export {relicsSim,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh};
 
 const relicsSim = new RelicsFunction();
+const relicsSimVersion = "0.1.3";
 // relicsSim.creatRelic("cup","fire",["ATKPer","critRate","critDMG","elementMastery"],[5.8,3.9,7.8,23]);
 
 // 词缀条目
@@ -30,8 +36,8 @@ const feather = ["ATK"],
     flower = ["HP"],
     hourglass = ["ATKPer", "defPer", "HPPer", "elementMastery", "energyRecharge"],
     hat = ["critRate", "critDMG", "ATKPer", "defPer", "HPPer", "elementMastery", "HPRes"],
-    cup = ["ATKPer", "defPer", "HPPer", "elementMastery", "water", "fire", "thunder", "stone", "wind", "ice", "Physical"],
-    mainEntryList = ["ATK", "HP", "critRate", "energyRecharge", "HPRes", "critDMG", "ATKPer", "defPer", "HPPer", "elementMastery", "water", "fire", "thunder", "stone", "wind", "ice", "Physical"],
+    cup = ["ATKPer", "defPer", "HPPer", "elementMastery", "water", "fire", "thunder", "rock", "wind", "ice", "Physical"],
+    mainEntryList = ["ATK", "HP", "critRate", "energyRecharge", "HPRes", "critDMG", "ATKPer", "defPer", "HPPer", "elementMastery", "water", "fire", "thunder", "rock", "wind", "ice", "Physical"],
     mainEntryListCh = ["攻击", "生命", "暴击率%", "充能效率%", "治疗加成", "暴击伤害%", "攻击%", "防御%", "生命%", "元素精通", "水元素伤害", "火元素伤害", "雷元素伤害", "岩元素伤害", "风元素伤害", "冰元素伤害", "物理伤害"];
 
 const cusEntryList = {
@@ -259,6 +265,29 @@ RelicsFunction.prototype.undoDel = function () {
 /** 辅助函数 **/
 
 /**
+ * 模拟器版本检查
+ * @returns 检查结果
+ */
+function versionCheck(){
+    let storage = window.localStorage;
+    if(!storage){
+        alert("浏览器不支持localstorage");
+        return false;
+    }else{
+        if(storage.relicsSimVersion == undefined){
+            storage.relicsSimVersion = relicsSimVersion;
+            return true;
+        }else if(storage.relicsSimVersion != relicsSimVersion){
+            alert("模拟器版本更新，如果遇到错误，请尝试清除浏览器缓存!");
+            storage.relicsSimVersion = relicsSimVersion;
+            return false;
+        }
+    }
+    return true;
+}
+versionCheck();
+
+/**
  * 根据数组随机概率
  * @param {Array} __arr1  随机列表
  * @param {Array} __arr2  随机概率（对应arr1）
@@ -323,8 +352,8 @@ function randomMainEntry(__part) {
 
 /**
  * 自选副词条合规验证
- * @param {string} __mainEntry 
- * @param {Array} __entryArr 
+ * @param {string} __mainEntry 主词条
+ * @param {Array} __entryArr 副词条数组
  * @returns 
  */
 function entryVerify(__mainEntry, __entryArr) {

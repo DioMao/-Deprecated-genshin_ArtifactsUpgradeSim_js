@@ -92,20 +92,14 @@
             bottom: 0;
         }
         .buttonBox{
-            position: absolute;
-            right: 30px;
-            bottom: 20px;
-            z-index: 10;
+            display: flex;
+            margin-top: 20px;
+            margin-right: 10px;
+            justify-content: flex-end;
         }
         .selectBox{
             width: 160px;
             position: relative;
-        }
-        #start{
-            float: left;
-        }
-        #clear{
-            margin: 0 15px;
         }
     </style>
 </head>
@@ -175,7 +169,7 @@
                 </div>
             </div>
             <footer>
-                <div class="buttonBox">
+                <div class="gap-2 d-md-flex justify-content-md-end buttonBox">
                     <div class="btn-group">
                         <button id="start" @click="start" class="btn btn-primary">新增数据</button>
                         <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
@@ -400,6 +394,7 @@
                         localStorage.localRecord = JSON.stringify(record);
                     }
                 },
+                // 保存设置
                 changeSetting(){
                     if(!window.localStorage){
                         alert("浏览器不支持localstorage");
