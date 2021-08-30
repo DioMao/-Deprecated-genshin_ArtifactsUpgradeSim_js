@@ -21,7 +21,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            z-index: 99;
+            z-index: 2000;
             background-color: #fff;
         }
         #loading .loading-box{
@@ -38,6 +38,17 @@
             width: 100%;
             position: fixed;
             z-index: 10;
+        }
+        .alertBox{
+            user-select: none;
+            position: fixed;
+            z-index: 1056;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.2s ease-in;
         }
         .demo-container{
             user-select: none;
@@ -116,6 +127,21 @@
             </div>
         </div>
         <!-- /loading -->
+        <!-- alert -->
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </symbol>
+        </svg>
+        <div class="alertBox">
+            <div class="alert alert-success d-flex align-items-center" role="alert" v-if="alertShow">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+                <div>
+                    {{ alertMsg }}
+                </div>
+            </div>
+        </div>
+        <!-- /alert -->
         <!-- nav -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
             <div class="container-fluid">
@@ -279,25 +305,26 @@
         const app = Vue.createApp({
             data() {
                 return {
-                    isLoad: false,
-                    showIndex: -1,
-                    relicsList: [],
-                    parts: [],
-                    entryList: [],
-                    clearAll: '',
-                    selected: "default",
-                    clearCheck: false,
-                    cusCloseSwitch: true,
-                    cusPart: "",
-                    cusMainEntry: "",
-                    cusEntry: [],
-                    cusEntryRate: {},
-                    cusEntryList: {},
-                    entryValue: {},
-                    userSetting:{
+                    isLoad: false,              // 加载界面显示（isLoad表示页面加载是否完成）
+                    showIndex: -1,              // 右侧圣遗物展示序号
+                    relicsList: [],             // 圣遗物列表
+                    parts: [],                  // 圣遗物位置*自选
+                    entryList: [],              // 副词条列表
+                    selected: "default",        // 根据位置筛选结果
+                    cusCloseSwitch: true,       // 自选圣遗物-生成后是否关闭modal窗
+                    cusPart: "",                // 自选圣遗物位置
+                    cusMainEntry: "",           // 自选圣遗物主词条
+                    cusEntry: [],               // 自选圣遗物副词条
+                    cusEntryRate: {},           // 自选圣遗物副词条数值
+                    cusEntryList: {},           // 自选圣遗物副词对照表
+                    entryValue: {},             // 自选圣遗物副词数值对照表
+                    userSetting:{               // 用户设置-测试
                         "test": true,
                         "test2": false
-                    }
+                    },
+                    alertShow: false,            // 是否显示提示框
+                    alertMsg: '',                // 提示框内容
+                    alertClose: ''               // 定时关闭提示框
                 }
             },
             created(){
@@ -337,6 +364,7 @@
                     relicsSim.creatRelic();
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
+                    this.alertControl("随机圣遗物已生成！",1500);
                 },
                 // 自选圣遗物
                 cusCreatRelic(){
@@ -349,6 +377,7 @@
                     relicsSim.creatRelic(this.cusPart,this.cusMainEntry,cusEntry,cusEntryValue);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
+                    this.alertControl("自选圣遗物已生成！",1500);
                 },
                 // 圣遗物升级
                 relicUpgrade(index,entry=""){
@@ -375,12 +404,14 @@
                     relicsSim.deleteOne(index);
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
+                    this.alertControl("删除圣遗物成功！",1500);
                 },
                 // 撤销删除
                 undoDel(){
                     relicsSim.undoDel();
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
+                    this.alertControl("撤销删除成功！",1500);
                 },
                 // 初始化全部圣遗物
                 resetAll(){
@@ -405,6 +436,15 @@
                     }else{
                         localStorage.userSetting = JSON.stringify(this.userSetting);
                     }
+                },
+                // 操作提示-提示框
+                alertControl(msg,time = 2000){
+                    this.alertMsg = msg;
+                    this.alertShow = true;
+                    if(this.alertClose != "") clearTimeout(this.alertClose);
+                    this.alertClose = setTimeout(() => {
+                        this.alertShow = false;
+                    },time)
                 },
                 // 转换为中文
                 toChinese(word,type){
