@@ -134,10 +134,10 @@
             </symbol>
         </svg>
         <div class="alertBox">
-            <div class="alert alert-success d-flex align-items-center" role="alert" v-if="alertShow">
+            <div class="alert alert-success d-flex align-items-center" role="alert" v-if="alertFunc.alertShow">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
                 <div>
-                    {{ alertMsg }}
+                    {{ alertFunc.alertMsg }}
                 </div>
             </div>
         </div>
@@ -323,28 +323,14 @@
                         "test": true,
                         "test2": false
                     },
-                    alertShow: false,            // 是否显示提示框
-                    alertMsg: '',                // 提示框内容
-                    alertClose: Function               // 定时关闭提示框
+                    alertFunc: {
+                        alertShow: false,        // 是否显示提示框
+                        alertMsg: '',            // 提示框内容
+                        alertClose: Function     // 定时关闭提示框
+                    }
                 }
             },
             created(){
-                if(!window.localStorage){
-                    alert("浏览器不支持localstorage");
-                    return false;
-                }else{
-                    if(localStorage.localRecord == undefined){
-                        localStorage.localRecord = [];
-                    }else if(localStorage.localRecord != '' || localStorage.localRecord != []){
-                        relicsSim.result = JSON.parse(localStorage.getItem("localRecord"));
-                        this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
-                    };
-                    if(localStorage.userSetting == undefined){
-                        localStorage.userSetting = '';
-                    }else if(localStorage.userSetting != '' || localStorage.userSetting != {}){
-                        this.userSetting = JSON.parse(localStorage.getItem("userSetting"));
-                    };
-                }
                 this.parts = parts;
                 this.entryList = entryList;
                 this.cusEntryList = cusEntryList;
@@ -356,6 +342,22 @@
                 console.log("Vue is runnning.");
             },
             mounted(){
+                if(!window.localStorage){
+                    alert("浏览器不支持localstorage");
+                    return false;
+                }else{
+                    if(localStorage.localRecord == undefined){
+                        localStorage.localRecord = [];
+                    }else if(localStorage.localRecord != '' || localStorage.localRecord != []){
+                        relicsSim.result = JSON.parse(localStorage.getItem("localRecord"));
+                        this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
+                    };
+                    if(localStorage.userSetting == undefined){
+                        localStorage.userSetting = JSON.stringify(this.userSetting);
+                    }else if(localStorage.userSetting != '' || localStorage.userSetting != {}){
+                        this.userSetting = JSON.parse(localStorage.getItem("userSetting"));
+                    };
+                }
                 this.$nextTick(function(){
                     this.isLoad = true;
                 })
@@ -444,11 +446,11 @@
                 },
                 // 操作提示-提示框
                 alertControl(msg,time = 2000){
-                    this.alertMsg = msg;
-                    this.alertShow = true;
-                    clearTimeout(this.alertClose);
-                    this.alertClose = setTimeout(() => {
-                        this.alertShow = false;
+                    this.alertFunc.alertMsg = msg;
+                    this.alertFunc.alertShow = true;
+                    clearTimeout(this.alertFunc.alertClose);
+                    this.alertFunc.alertClose = setTimeout(() => {
+                        this.alertFunc.alertShow = false;
                     },time)
                 },
                 // 转换为中文
