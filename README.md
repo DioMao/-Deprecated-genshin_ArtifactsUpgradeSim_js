@@ -4,6 +4,10 @@
 
 概率数据来自于网络，仅供娱乐。
 
+#### Demo预览（可能落后于当前版本）：
+
+> https://diomao.github.io/RelicsSim.github.io/
+
 #### 1. 生成新的圣遗物数据：
 
 > relicsSim.creatRelic(part,mainEntry,entry,entryRate)
