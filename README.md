@@ -1,3 +1,5 @@
+# 原来，你也玩原神。
+
 ### 原神圣遗物强化模拟
 
 ---
@@ -57,29 +59,39 @@
 
 ####  3. 圣遗物强化
 
-> relicsSim.upgrade(index,entry)
+> relicsSim.upgrade(index,entry,level)
 
 参数说明:
 
-- index: number，必选，对应relicsSim.result中存储的圣遗物下标
-- entry: string，可选，指定强化的副词条，若不存在则会随机强化；词条不满四条时无效。
+- index: number，必选，对应relicsSim.result中存储的圣遗物下标。
+- entry: string，可选，指定强化的副词条，若不存在则会随机强化；词条不满四条时会优先补满四词条。
+- level: number,可选，强化词条的数值档位。例如爆伤有四档数值，0-3表示从低到高的四档数值。
+
+#### 4.圣遗物得分计算
+
+> relicsSim.relicScore(index,rule)
+
+参数说明：
+
+- index: number，必选，对应relicsSim.result中存储的圣遗物下标。
+- rule: 评分规则，可选，圣遗物评分规则。默认评价输出攻击。目前评分规则待完善，只有默认。
 
 
-#### 4. 删除指定圣遗物
+#### 5. 删除指定圣遗物
 
 > relicsSim.deleteOne(index)
 
 参数说明:
 
-- index: number，必选，对应relicsSim.result中存储的圣遗物下标
+- index: number，必选，对应relicsSim.result中存储的圣遗物下标。
 
-#### 5. 重置圣遗物
+#### 6. 重置圣遗物
 
 > relicsSim.reset(index)
 
 参数说明:
 
-- index: number，必选，对应relicsSim.result中存储的圣遗物下标
+- index: number，必选，对应relicsSim.result中存储的圣遗物下标。
 
 全部重置:
 
