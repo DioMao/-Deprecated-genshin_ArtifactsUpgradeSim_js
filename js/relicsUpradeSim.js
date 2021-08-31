@@ -210,6 +210,9 @@ RelicsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = 
  * @returns 得分
  */
 RelicsFunction.prototype.relicScore = function(__index, __rule = "default"){
+    if(__index >= this.result.length || __index < 0){
+        return 0;
+    }
     // 计分标准（待完善）
     let scoreStandar = {
         "critRate": 2,
