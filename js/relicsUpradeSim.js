@@ -79,7 +79,8 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
         mainEntry: "none",
         entry: [],
         initEntry: '',
-        upgradeHistory: []
+        upgradeHistory: [],
+        creationDate: Date.now()
     }
     // 自选或随机位置
     if (typeof (__part) == "string" && parts.indexOf(__part) != -1) {
@@ -203,6 +204,50 @@ RelicsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = 
 }
 
 /**
+ * 圣遗物得分计算
+ * @param {*} __index 需要计算的圣遗物序号 
+ * @param {*} __rule 计算规则
+ * @returns 得分
+ */
+RelicsFunction.prototype.relicScore = function(__index, __rule = "default"){
+    // 计分标准（待完善）
+    let scoreStandar = {
+        "critRate": 2,
+        "critDMG": 1,
+        "ATK": 0.13,
+        "ATKPer": 1.345,
+        "def": 0.11,
+        "defPer": 1.07,
+        "HP": 0.0087,
+        "HPPer": 1.345,
+        "energyRecharge": 1.2,
+        "elementMastery": 0.339
+    }
+    let atkScore = 0,
+    defScore = 0,
+    HPScore = 0,
+    rechargeScore = 0,
+    EMScore = 0,
+    entryArr = this.result[__index].entry;
+    for(let i = 0; i < entryArr.length; i++){
+        let entryNow = entryArr[i][0];
+        if(entryNow == "critRate" || entryNow == "critDMG" || entryNow == "ATK" || entryNow == "ATKPer"){
+            atkScore += entryArr[i][1]*scoreStandar[entryNow];
+        }else if(entryNow == "def" || entryNow == "defPer"){
+            defScore += entryArr[i][1]*scoreStandar[entryNow];
+        }else if(entryNow == "HP" || entryNow == "HPPer"){
+            HPScore += entryArr[i][1]*scoreStandar[entryNow];
+        }else if(entryNow == "energyRecharge"){
+            rechargeScore += entryArr[i][1]*scoreStandar[entryNow];
+        }else if(entryNow == "elementMastery"){
+            EMScore += entryArr[i][1]*scoreStandar[entryNow];
+        }
+    }
+    // 暂时只计算输出得分
+    return atkScore;
+}
+
+/**
  * 圣遗物重置初始状态
  * @param {number} __index 序号
  */
@@ -237,7 +282,7 @@ RelicsFunction.prototype.deleteOne = function (__del) {
 RelicsFunction.prototype.batchDelete = function (__delArr) {
     __delArr.sort((a, b) => a - b);
     for (let i = __delArr.length - 1; i >= 0; i--) {
-        this.result.splice(__delArr[i], 1)
+        this.deleteHistory.push(this.result.splice(__delArr[i], 1)[0]);
     }
 }
 

@@ -195,6 +195,7 @@
                     <div v-for="(value,key) in relicsList[showIndex]">
                         <div>{{ key }} : {{ value }}</div>
                     </div>
+                    <div v-if="showIndex!=-1"> {{ relicScore(showIndex) }} </div>
                 </div>
             </div>
             <footer>
@@ -324,7 +325,7 @@
                     },
                     alertShow: false,            // 是否显示提示框
                     alertMsg: '',                // 提示框内容
-                    alertClose: ''               // 定时关闭提示框
+                    alertClose: Function               // 定时关闭提示框
                 }
             },
             created(){
@@ -385,6 +386,10 @@
                     this.relicsList = [...relicsSim.result];
                     this.localRecord(this.relicsList);
                 },
+                //
+                relicScore(index,rule="default"){
+                    return relicsSim.relicScore(index);
+                },
                 // 初始化圣遗物
                 initRelic(index){
                     relicsSim.reset(index);
@@ -441,7 +446,7 @@
                 alertControl(msg,time = 2000){
                     this.alertMsg = msg;
                     this.alertShow = true;
-                    if(this.alertClose != "") clearTimeout(this.alertClose);
+                    clearTimeout(this.alertClose);
                     this.alertClose = setTimeout(() => {
                         this.alertShow = false;
                     },time)
