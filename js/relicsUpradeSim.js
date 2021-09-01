@@ -1,13 +1,12 @@
 /**
- * relicsUpgradeSim v0.1.3
+ * relicsUpgradeSim v0.1.4
  * Copyrigth 2021-2022 DioMao (https://github.com/DioMao/genshin_relicsUpgradeSim_js/graphs/contributors)
  * Licensed under MIT (https://github.com/DioMao/genshin_relicsUpgradeSim_js/blob/main/LICENSE)
  */
 "use strict";
-// export {relicsSim,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh};
 
 const relicsSim = new RelicsFunction();
-const relicsSimVersion = "0.1.3";
+const relicsSimVersion = "0.1.4";
 // relicsSim.creatRelic("cup","fire",["ATKPer","critRate","critDMG","elementMastery"],[5.8,3.9,7.8,23]);
 
 // 词缀条目
@@ -124,7 +123,7 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
             newRelics.entry[i] = [newEntry, newEntryRate];
         }
         // 是否拥有初始四词条
-        if (Math.random() < 0.2) {
+        if (Math.random() < 0.25) {
             let newEntry = randomRate(relicEntry, relicEntryRate);
             newRelics.entry[3] = [newEntry, randomEntryValue(newEntry)];
         }
@@ -134,8 +133,7 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
     // 保存结果
     this.result.push(newRelics);
     this.count++;
-    console.log(newRelics);
-    // console.log(this.result);
+    // console.log(newRelics);
     return newRelics;
 }
 
@@ -144,6 +142,7 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
  * @param {number} __index 序号
  * @param {string} __entry 指定强化的词条（默认空值）
  * @param {number} __upLevel 强化数值的级别(0-3，3最高)
+ * @returns 升级结果
  */
 RelicsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = -1) {
     if (__index >= this.result.length || __index < 0) return false;
@@ -195,12 +194,13 @@ RelicsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = 
         }else{
             upRate = randomEntryValue(upEntry);
         }
-        console.log("Upgrade success," + upEntry + " + " + upRate);
+        // console.log("Upgrade success," + upEntry + " + " + upRate);
         this.result[__index].entry[upIndex][1] += upRate;
         this.result[__index].upgradeHistory.push([upEntry, upRate]);
     }
     // 增加等级
     this.result[__index].level += 4;
+    return true;
 }
 
 /**
@@ -301,6 +301,7 @@ RelicsFunction.prototype.clearAll = function () {
 
 /**
  * 撤销删除（对deleteOne删除的数据生效）
+ * @returns 结果
  */
 RelicsFunction.prototype.undoDel = function () {
     if (this.deleteHistory.length == 0) {
@@ -308,6 +309,7 @@ RelicsFunction.prototype.undoDel = function () {
         return false;
     }
     this.result.push(this.deleteHistory.pop());
+    return true;
 }
 
 /** 辅助函数 **/
