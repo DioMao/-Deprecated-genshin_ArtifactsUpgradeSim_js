@@ -431,13 +431,13 @@
                     this.radarChartOption = {
                         radar: {
                             indicator: [
-                                { name: '攻击力', max: entryValue['ATKPer'][entryValue['ATKPer'].length-1]*6},
-                                { name: '暴击', max: entryValue['critRate'][entryValue['critRate'].length-1]*6},
-                                { name: '暴伤' , max: entryValue['critDMG'][entryValue['critDMG'].length-1]*6},
-                                { name: '生命值', max: entryValue['HPPer'][entryValue['HPPer'].length-1]*6},
-                                { name: '防御力', max: entryValue['defPer'][entryValue['defPer'].length-1]*6},
-                                { name: '充能效率', max: entryValue['energyRecharge'][entryValue['energyRecharge'].length-1]*6},
-                                { name: '元素精通', max: entryValue['elementMastery'][entryValue['elementMastery'].length-1]*6}
+                                { name: '攻击力', max: entryValue['ATKPer'][entryValue['ATKPer'].length-1]*6, min: -5.8},
+                                { name: '暴击', max: entryValue['critRate'][entryValue['critRate'].length-1]*6, min: -3.9},
+                                { name: '暴伤' , max: entryValue['critDMG'][entryValue['critDMG'].length-1]*6, min: -7.8},
+                                { name: '生命值', max: entryValue['HPPer'][entryValue['HPPer'].length-1]*6, min: -5.8},
+                                { name: '防御力', max: entryValue['defPer'][entryValue['defPer'].length-1]*6, min: -7.3},
+                                { name: '充能效率', max: entryValue['energyRecharge'][entryValue['energyRecharge'].length-1]*6, min: -6.5},
+                                { name: '元素精通', max: entryValue['elementMastery'][entryValue['elementMastery'].length-1]*6, min: -23}
                             ]
                         },
                         series: [{
