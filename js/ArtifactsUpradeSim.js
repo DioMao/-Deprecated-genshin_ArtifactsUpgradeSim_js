@@ -1,13 +1,13 @@
 /**
- * relicsUpgradeSim v0.1.4
- * Copyrigth 2021-2022 DioMao (https://github.com/DioMao/genshin_relicsUpgradeSim_js/graphs/contributors)
- * Licensed under MIT (https://github.com/DioMao/genshin_relicsUpgradeSim_js/blob/main/LICENSE)
+ * ArtifactsUpgradeSim v0.1.4
+ * Copyrigth 2021-2022 DioMao (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/graphs/contributors)
+ * Licensed under MIT (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/blob/main/LICENSE)
  */
 "use strict";
 
-const relicsSim = new RelicsFunction();
-const relicsSimVersion = "0.1.4";
-// relicsSim.creatRelic("cup","fire",["ATKPer","critRate","critDMG","elementMastery"],[5.8,3.9,7.8,23]);
+const ArtifactsSim = new ArtifactsFunction();
+const ArtifactsSimVersion = "0.1.4";
+// ArtifactsSim.creatArtifact("cup","fire",["ATKPer","critRate","critDMG","elementMastery"],[5.8,3.9,7.8,23]);
 
 // 词缀条目
 const entryList = ["critRate", "critDMG", "ATK", "ATKPer", "def", "defPer", "HP", "HPPer", "energyRecharge", "elementMastery"],
@@ -55,7 +55,7 @@ const hourglassRate = [0.26, 0.26, 0.26, 0.1, 0.1],
 /**
  * 构造函数
  */
-function RelicsFunction() {
+function ArtifactsFunction() {
     this.result = [];
     this.count = 0;
     this.history = [];
@@ -69,10 +69,10 @@ function RelicsFunction() {
  * @param {string} __main 指定主词条，可为空
  * @param {Array} __entryArr 指定词条（3-4条），可为空
  * @param {Array} __entryRate 副词条数值（对应自选副词条），可为空
- * @returns {object} 对象newRelics
+ * @returns {object} 对象newArtifacts
  */
-RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entry = [], __entryRate = []) {
-    let newRelics = {
+ArtifactsFunction.prototype.creatArtifact = function (__part = "", __main = "", __entry = [], __entryRate = []) {
+    let newArtifacts = {
         level: 0,
         part: "none",
         mainEntry: "none",
@@ -83,18 +83,18 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
     }
     // 自选或随机位置
     if (typeof (__part) == "string" && parts.indexOf(__part) != -1) {
-        newRelics.part = __part;
+        newArtifacts.part = __part;
     } else {
-        newRelics.part = parts[Math.floor((Math.random() * parts.length))];
+        newArtifacts.part = parts[Math.floor((Math.random() * parts.length))];
     }
     // 自选或随机主属性
-    if (typeof (__main) == "string" && mainEntryList.indexOf(__main) != -1 && mainEntryVerify(newRelics.part, __main)) {
-        newRelics.mainEntry = __main;
+    if (typeof (__main) == "string" && mainEntryList.indexOf(__main) != -1 && mainEntryVerify(newArtifacts.part, __main)) {
+        newArtifacts.mainEntry = __main;
     } else {
-        newRelics.mainEntry = randomMainEntry(newRelics.part);
+        newArtifacts.mainEntry = randomMainEntry(newArtifacts.part);
     }
     // 自选副词条
-    if (__entry.length == 3 || __entry.length == 4 && entryVerify(newRelics.mainEntry, __entry)) {
+    if (__entry.length == 3 || __entry.length == 4 && entryVerify(newArtifacts.mainEntry, __entry)) {
         for (let i = 0; i < __entry.length; i++) {
             let cusEntry = __entry[i],
                 cusEntryRate = __entryRate[i];
@@ -102,39 +102,39 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
             if (__entryRate.length == 0 || typeof (cusEntryRate) != "number" || entryValue[cusEntry].indexOf(cusEntryRate) == -1) {
                 cusEntryRate = randomEntryValue(__entry);
             }
-            newRelics.entry.push([cusEntry, cusEntryRate]);
+            newArtifacts.entry.push([cusEntry, cusEntryRate]);
         }
     } else {
-        let relicEntry = [],
-            relicEntryRate = [];
+        let ArtifactEntry = [],
+            ArtifactEntryRate = [];
         for (let i = 0; i < entryList.length; i++) {
-            entryList[i] == newRelics.mainEntry ? null : (relicEntry.push(entryList[i]), relicEntryRate.push(entryProbability[i]));
+            entryList[i] == newArtifacts.mainEntry ? null : (ArtifactEntry.push(entryList[i]), ArtifactEntryRate.push(entryProbability[i]));
         }
         // 随机词条
         for (let i = 0; i < 3; i++) {
             //临时词条库
-            let newEntry = randomRate(relicEntry, relicEntryRate),
+            let newEntry = randomRate(ArtifactEntry, ArtifactEntryRate),
                 newEntryRate = randomEntryValue(newEntry),
-                index = relicEntry.indexOf(newEntry);
+                index = ArtifactEntry.indexOf(newEntry);
             // 从临时词条库中移除已有词条，避免重复
-            relicEntry.splice(index, 1);
-            relicEntryRate.splice(index, 1);
+            ArtifactEntry.splice(index, 1);
+            ArtifactEntryRate.splice(index, 1);
             // 写入词条数据
-            newRelics.entry[i] = [newEntry, newEntryRate];
+            newArtifacts.entry[i] = [newEntry, newEntryRate];
         }
         // 是否拥有初始四词条
         if (Math.random() < 0.25) {
-            let newEntry = randomRate(relicEntry, relicEntryRate);
-            newRelics.entry[3] = [newEntry, randomEntryValue(newEntry)];
+            let newEntry = randomRate(ArtifactEntry, ArtifactEntryRate);
+            newArtifacts.entry[3] = [newEntry, randomEntryValue(newEntry)];
         }
     }
     // 保存初始状态
-    newRelics.initEntry = JSON.stringify(newRelics.entry);
+    newArtifacts.initEntry = JSON.stringify(newArtifacts.entry);
     // 保存结果
-    this.result.push(newRelics);
+    this.result.push(newArtifacts);
     this.count++;
-    // console.log(newRelics);
-    return newRelics;
+    // console.log(newArtifacts);
+    return newArtifacts;
 }
 
 /**
@@ -144,21 +144,21 @@ RelicsFunction.prototype.creatRelic = function (__part = "", __main = "", __entr
  * @param {number} __upLevel 强化数值的级别(0-3，3最高)
  * @returns 升级结果
  */
-RelicsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = -1) {
+ArtifactsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = -1) {
     if (__index >= this.result.length || __index < 0) return false;
-    let currentRelic = this.result[__index],
+    let currentArtifact = this.result[__index],
         currentEntry = [],
         currentEntryList = [],
         currentEntryRate = [];
     // 判断圣遗物是否满级
-    if (currentRelic.level >= 20) {
-        console.log("Upgrade failed,this relic is fully rated.");
+    if (currentArtifact.level >= 20) {
+        console.log("Upgrade failed,this Artifact is fully rated.");
         return false;
     };
     // 是否需要补充词条
-    if (currentRelic.entry.length < 4) {
-        for (let i = 0; i < currentRelic.entry.length; i++) {
-            currentEntry.push(currentRelic.entry[i][0]);
+    if (currentArtifact.entry.length < 4) {
+        for (let i = 0; i < currentArtifact.entry.length; i++) {
+            currentEntry.push(currentArtifact.entry[i][0]);
         }
         // 挑选可用词条（避免与其余词条重复）
         for (let i = 0; i < entryList.length; i++) {
@@ -178,16 +178,16 @@ RelicsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = 
             upRate = 0;
         // 优先升级自选词条
         if (__entry != "" && entryList.indexOf(__entry) >= 0) {
-            for (let i = 0; i < currentRelic.entry.length; i++) {
-                if (__entry == currentRelic.entry[i][0]) {
+            for (let i = 0; i < currentArtifact.entry.length; i++) {
+                if (__entry == currentArtifact.entry[i][0]) {
                     upIndex = i;
-                    upEntry = currentRelic.entry[i][0];
+                    upEntry = currentArtifact.entry[i][0];
                 }
             }
         } else {
             // 升级随机词条
-            upIndex = Math.floor(Math.random() * currentRelic.entry.length);
-            upEntry = currentRelic.entry[upIndex][0];
+            upIndex = Math.floor(Math.random() * currentArtifact.entry.length);
+            upEntry = currentArtifact.entry[upIndex][0];
         }
         if(__upLevel != -1 && typeof(__upLevel) == "number" && Math.floor(__upLevel) < entryValue[upEntry].length){
             upRate = entryValue[upEntry][Math.floor(__upLevel)];
@@ -209,7 +209,7 @@ RelicsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel = 
  * @param {*} __rule 计算规则
  * @returns 得分
  */
-RelicsFunction.prototype.relicScore = function(__index, __rule = "default"){
+ArtifactsFunction.prototype.ArtifactScore = function(__index, __rule = "default"){
     if(__index >= this.result.length || __index < 0){
         return 0;
     }
@@ -254,7 +254,7 @@ RelicsFunction.prototype.relicScore = function(__index, __rule = "default"){
  * 圣遗物重置初始状态
  * @param {number} __index 序号
  */
-RelicsFunction.prototype.reset = function (__index) {
+ArtifactsFunction.prototype.reset = function (__index) {
     this.result[__index].entry.length = 0;
     this.result[__index].entry = JSON.parse(this.result[__index].initEntry);
     this.result[__index].upgradeHistory.length = 0;
@@ -264,7 +264,7 @@ RelicsFunction.prototype.reset = function (__index) {
 /**
  * 重置全部圣遗物状态
  */
-RelicsFunction.prototype.resetAll = function () {
+ArtifactsFunction.prototype.resetAll = function () {
     for (let i = 0; i < this.result.length; i++) {
         this.reset(i);
     }
@@ -274,7 +274,7 @@ RelicsFunction.prototype.resetAll = function () {
  * 删除指定数据
  * @param {number} __del 要删除的遗物序号
  */
-RelicsFunction.prototype.deleteOne = function (__del) {
+ArtifactsFunction.prototype.deleteOne = function (__del) {
     this.deleteHistory.push(this.result.splice(__del, 1)[0]);
 }
 
@@ -282,7 +282,7 @@ RelicsFunction.prototype.deleteOne = function (__del) {
  * 批量删除指定数据
  * @param {Array} __delArr 要删除的遗物序号（数组）
  */
-RelicsFunction.prototype.batchDelete = function (__delArr) {
+ArtifactsFunction.prototype.batchDelete = function (__delArr) {
     __delArr.sort((a, b) => a - b);
     for (let i = __delArr.length - 1; i >= 0; i--) {
         this.deleteHistory.push(this.result.splice(__delArr[i], 1)[0]);
@@ -292,7 +292,7 @@ RelicsFunction.prototype.batchDelete = function (__delArr) {
 /**
  * 清空数据
  */
-RelicsFunction.prototype.clearAll = function () {
+ArtifactsFunction.prototype.clearAll = function () {
     // 备份原数据
     if (this.backup.length != 0) this.backup.length = 0;
     this.backup = JSON.parse(JSON.stringify(this.result));
@@ -303,7 +303,7 @@ RelicsFunction.prototype.clearAll = function () {
  * 撤销删除（对deleteOne删除的数据生效）
  * @returns 结果
  */
-RelicsFunction.prototype.undoDel = function () {
+ArtifactsFunction.prototype.undoDel = function () {
     if (this.deleteHistory.length == 0) {
         console.log("Undo false, history not found.");
         return false;
@@ -324,12 +324,12 @@ function versionCheck(){
         alert("浏览器不支持localstorage");
         return false;
     }else{
-        if(storage.relicsSimVersion == undefined){
-            storage.relicsSimVersion = relicsSimVersion;
+        if(storage.ArtifactsSimVersion == undefined){
+            storage.ArtifactsSimVersion = ArtifactsSimVersion;
             return true;
-        }else if(storage.relicsSimVersion != relicsSimVersion){
+        }else if(storage.ArtifactsSimVersion != ArtifactsSimVersion){
             alert("模拟器版本更新，如果遇到错误，请尝试清除浏览器缓存!");
-            storage.relicsSimVersion = relicsSimVersion;
+            storage.ArtifactsSimVersion = ArtifactsSimVersion;
             return false;
         }
     }

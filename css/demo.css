@@ -47,7 +47,7 @@
 /* .demo-container::-webkit-scrollbar{
     display: none;
 } */
-.relicsBox{
+.ArtifactsBox{
     margin: 15px 10px;
     width: 10rem;
     height: 323px;
@@ -60,17 +60,17 @@
     height: 280px;
 }
 @media screen and (max-width:480px) {
-    .relicsBox{
+    .ArtifactsBox{
         width: calc(50% - 20px);
     }
 }
 @media screen and (max-width:979px){
-    .relicShowBox{
+    .ArtifactShowBox{
         display: none;
     }
 }
 @media screen and (min-width:980px){
-    .relicShowBox{
+    .ArtifactShowBox{
         position: fixed;
         padding-top: 20px;
         right: 0;

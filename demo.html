@@ -8,14 +8,14 @@
     <meta name="description" content="原神圣遗物强化模拟_demo">
     <meta name="author" content="DioMao">
     <meta name="renderer" content="webkit">
-    <title>Genshin Relics Upgrade Simulator</title>
+    <title>Genshin Artifacts Upgrade Simulator</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/demo.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <script src="js/echarts.min.js"></script>
     <script src="js/vue@3.2.4.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/relicsUpradeSim.js"></script>
+    <script src="js/ArtifactsUpradeSim.js"></script>
 </head>
 
 <body>
@@ -65,34 +65,34 @@
             </div>
         </nav>
         <!-- /nav -->
-        <!-- Relics -->
+        <!-- Artifacts -->
         <div>
             <div class="container-fluid demo-container">
-                <div v-for="(relics,index) in relicsList" :class="'relicsBox card rounded '+ (index==showIndex?'shadow':'shadow-sm')" v-show="selected=='default' || selected == relics.part" @click="showIndex=index">
+                <div v-for="(Artifacts,index) in ArtifactsList" :class="'ArtifactsBox card rounded '+ (index==showIndex?'shadow':'shadow-sm')" v-show="selected=='default' || selected == Artifacts.part" @click="showIndex=index">
                     <div class="card-body">
-                        <div class="card-text fs-6 fw-bolder">{{ toChinese(relics.part,"parts") }}</div>
-                        <div class="card-text fw-bold lh-lg">主属性:{{ toChinese(relics.mainEntry,"mainEntry") }}</div>
-                        <span class="badge bg-dark">+{{ relics.level }}</span>
+                        <div class="card-text fs-6 fw-bolder">{{ toChinese(Artifacts.part,"parts") }}</div>
+                        <div class="card-text fw-bold lh-lg">主属性:{{ toChinese(Artifacts.mainEntry,"mainEntry") }}</div>
+                        <span class="badge bg-dark">+{{ Artifacts.level }}</span>
                     </div>
-                    <ul v-for="(entry,index2) in relics.entry" class="list-group list-group-flush">
-                        <li class="list-group-item" @click="relicUpgrade(index,entry[0])">{{ toChinese(entry[0],"entry") }} : {{ Number(entry[1].toFixed(2)) }}
-                            <span class="badge bg-primary upgradeCheat" v-show="relics.level<20">+</span>
+                    <ul v-for="(entry,index2) in Artifacts.entry" class="list-group list-group-flush">
+                        <li class="list-group-item" @click="ArtifactUpgrade(index,entry[0])">{{ toChinese(entry[0],"entry") }} : {{ Number(entry[1].toFixed(2)) }}
+                            <span class="badge bg-primary upgradeCheat" v-show="Artifacts.level<20">+</span>
                         </li>
-                        <li class="list-group-item" v-if="relics.entry.length == 3 && index2 == 2">——</li>
+                        <li class="list-group-item" v-if="Artifacts.entry.length == 3 && index2 == 2">——</li>
                     </ul>
                     <div class="card-body" style="text-align:center;">
-                        <button id="upgrade" @click="relicUpgrade(index)" class="btn btn-primary btn-sm float-start" :disabled="relics.level >= 20">
+                        <button id="upgrade" @click="ArtifactUpgrade(index)" class="btn btn-primary btn-sm float-start" :disabled="Artifacts.level >= 20">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-square" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
                             </svg>
                         </button>
-                        <button id="initRelic" @click="initRelic(index)" class="btn btn-success btn-sm" :disabled="relics.level==0">
+                        <button id="initArtifact" @click="initArtifact(index)" class="btn btn-success btn-sm" :disabled="Artifacts.level==0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
                                 <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
                                 <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
                             </svg>
                         </button>
-                        <button id="deleteRelic" @click.stop="deleteRelic(index)" class="btn btn-danger btn-sm float-end">
+                        <button id="deleteArtifact" @click.stop="deleteArtifact(index)" class="btn btn-danger btn-sm float-end">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
                                 <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
@@ -100,15 +100,15 @@
                         </button>
                     </div>
                 </div>
-                <div class="relicShowBox" v-show="showIndex>=0">
+                <div class="ArtifactShowBox" v-show="showIndex>=0">
                     <p>这里准备放个圣遗物展示界面</p>
-                    <div v-for="(value,key) in relicsList[showIndex]">
+                    <div v-for="(value,key) in ArtifactsList[showIndex]">
                         <div>{{ key }} : {{ value }}</div>
                     </div>
                     <div> 
                         <div id="radarChartBox" ref="radarChartBox"></div>
                     </div>
-                    <div>圣遗物评分：{{ relicScore(showIndex) }} </div>
+                    <div>圣遗物评分：{{ ArtifactScore(showIndex) }} </div>
                 </div>
             </div>
             <footer>
@@ -119,12 +119,12 @@
                             <span class="visually-hidden">Toggle Dropdown</span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#cusRelic">自选属性</a></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#cusArtifact">自选属性</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item disabled" href="#">敬请期待</a></li>
                         </ul>
                     </div>
-                    <button id="clear" @click="relicClear" class="btn btn-danger">清除数据</button>
+                    <button id="clear" @click="ArtifactClear" class="btn btn-danger">清除数据</button>
                     <div class="dropdown" style="display:inline-block;">
                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                           更多
@@ -141,19 +141,19 @@
                 </div>
             </footer>
         </div>
-        <!-- /Relics -->
+        <!-- /Artifacts -->
         <!-- cusModal -->
-        <div class="modal fade" id="cusRelic" tabindex="-1" data-bs-backdrop="static" aria-labelledby="cusRelicLabel" aria-hidden="true">
+        <div class="modal fade" id="cusArtifact" tabindex="-1" data-bs-backdrop="static" aria-labelledby="cusArtifactLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="cusRelicLabel">自选圣遗物</h5>
+                        <h5 class="modal-title" id="cusArtifactLabel">自选圣遗物</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <!-- 自选位置 -->
-                        <label for="cutRelicPart" class="form-label fw-bold">位置</label>
-                        <select id="cutRelicPart" class="form-select form-select-sm mb-3" v-model="cusPart" @change="cusEntry.length=0;cusMainEntry=''">
+                        <label for="cutArtifactPart" class="form-label fw-bold">位置</label>
+                        <select id="cutArtifactPart" class="form-select form-select-sm mb-3" v-model="cusPart" @change="cusEntry.length=0;cusMainEntry=''">
                             <option v-for="part in parts" :value="part">{{ toChinese(part,"parts") }}</option>
                         </select>
                         <!-- 自选主属性 -->
@@ -179,7 +179,7 @@
                             <label class="form-check-label" for="cusCloseSwitch">生成后关闭此窗口</label>
                         </div>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                        <button type="button" class="btn btn-primary" @click="cusCreatRelic" :data-bs-dismiss="cusCloseSwitch?'modal':null">确认</button>
+                        <button type="button" class="btn btn-primary" @click="cusCreatArtifact" :data-bs-dismiss="cusCloseSwitch?'modal':null">确认</button>
                     </div>
                 </div>
             </div>
@@ -246,7 +246,7 @@
     </div>
 
     <!-- <script type="module">
-        import {relicsSim,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh} from "./js/relicUpgradeSim.js"
+        import {ArtifactsSim,parts,partsCh,entryList,entryListCh,mainEntryList,mainEntryListCh} from "./js/ArtifactUpgradeSim.js"
     </script> -->
     <script>
         const app = Vue.createApp({
@@ -254,7 +254,7 @@
                 return {
                     isLoad: false,                  // 加载界面显示（isLoad表示页面加载是否完成）
                     showIndex: -1,                  // 右侧圣遗物展示序号
-                    relicsList: Array,              // 圣遗物列表
+                    ArtifactsList: Array,              // 圣遗物列表
                     parts: Array,                   // 圣遗物位置*自选
                     entryList: Array,               // 副词条列表
                     selected: "default",            // 根据位置筛选结果
@@ -285,7 +285,7 @@
                 this.entryList = entryList;
                 this.cusEntryList = cusEntryList;
                 this.entryValue = entryValue;
-                this.version = relicsSimVersion;
+                this.version = ArtifactsSimVersion;
                 // 初始化自选副词条为最大值
                 for(let i in entryValue){
                     this.cusEntryRate[i] = entryValue[i][entryValue[i].length-1];
@@ -300,8 +300,8 @@
                     if(localStorage.localRecord == undefined){
                         localStorage.localRecord = [];
                     }else if(localStorage.localRecord != '' || localStorage.localRecord != "[]"){
-                        relicsSim.result = JSON.parse(localStorage.getItem("localRecord"));
-                        this.relicsList = JSON.parse(localStorage.getItem("localRecord"));
+                        ArtifactsSim.result = JSON.parse(localStorage.getItem("localRecord"));
+                        this.ArtifactsList = JSON.parse(localStorage.getItem("localRecord"));
                     };
                     if(localStorage.userSetting == undefined){
                         localStorage.userSetting = JSON.stringify(this.userSetting);
@@ -317,35 +317,35 @@
                 showIndex(val){
                     this.setRadarChart();
                 },
-                relicsList(val){
+                ArtifactsList(val){
                     this.setRadarChart();
                 }
             },
             methods:{
                 start(){
-                    relicsSim.creatRelic();
-                    this.relicsList = [...relicsSim.result];
-                    this.localRecord(this.relicsList);
+                    ArtifactsSim.creatArtifact();
+                    this.ArtifactsList = [...ArtifactsSim.result];
+                    this.localRecord(this.ArtifactsList);
                     this.alertControl("随机圣遗物已生成！",1500);
                 },
                 // 自选圣遗物
-                cusCreatRelic(){
+                cusCreatArtifact(){
                     let cusEntryValue = [],
                     cusEntry = [];
                     for(let i= 0; i < this.cusEntry.length; i++){
                         cusEntry.push(this.cusEntry[i]);
                         cusEntryValue.push(this.cusEntryRate[cusEntry[i]]);
                     }
-                    relicsSim.creatRelic(this.cusPart,this.cusMainEntry,cusEntry,cusEntryValue);
-                    this.relicsList = [...relicsSim.result];
-                    this.localRecord(this.relicsList);
+                    ArtifactsSim.creatArtifact(this.cusPart,this.cusMainEntry,cusEntry,cusEntryValue);
+                    this.ArtifactsList = [...ArtifactsSim.result];
+                    this.localRecord(this.ArtifactsList);
                     this.alertControl("自选圣遗物已生成！",1500);
                 },
                 // 圣遗物升级
-                relicUpgrade(index,entry=""){
-                    let res = relicsSim.upgrade(index,entry);
-                    this.relicsList = [...relicsSim.result];
-                    this.localRecord(this.relicsList);
+                ArtifactUpgrade(index,entry=""){
+                    let res = ArtifactsSim.upgrade(index,entry);
+                    this.ArtifactsList = [...ArtifactsSim.result];
+                    this.localRecord(this.ArtifactsList);
                     if(res == true){
                         this.alertControl("升级成功！",1500);
                     }else{
@@ -353,36 +353,36 @@
                     }
                 },
                 // 圣遗物评分-demo
-                relicScore(index,rule="default"){
-                    return relicsSim.relicScore(index);
+                ArtifactScore(index,rule="default"){
+                    return ArtifactsSim.ArtifactScore(index);
                 },
                 // 初始化圣遗物
-                initRelic(index){
-                    relicsSim.reset(index);
-                    this.relicsList = [...relicsSim.result];
-                    this.localRecord(this.relicsList);
+                initArtifact(index){
+                    ArtifactsSim.reset(index);
+                    this.ArtifactsList = [...ArtifactsSim.result];
+                    this.localRecord(this.ArtifactsList);
                     this.alertControl("重置圣遗物成功~再试试手气吧",1500);
                 },
                 // 清除结果列表
-                relicClear(){
+                ArtifactClear(){
                     this.showIndex = -1;
-                    relicsSim.clearAll();
-                    this.relicsList = [...relicsSim.result];
-                    this.localRecord(this.relicsList);
+                    ArtifactsSim.clearAll();
+                    this.ArtifactsList = [...ArtifactsSim.result];
+                    this.localRecord(this.ArtifactsList);
                 },
                 // 删除圣遗物
-                deleteRelic(index){
+                deleteArtifact(index){
                     this.showIndex = -1;
-                    relicsSim.deleteOne(index);
-                    this.relicsList = [...relicsSim.result];
-                    this.localRecord(this.relicsList);
+                    ArtifactsSim.deleteOne(index);
+                    this.ArtifactsList = [...ArtifactsSim.result];
+                    this.localRecord(this.ArtifactsList);
                     this.alertControl("删除圣遗物成功！",1500);
                 },
                 // 撤销删除
                 undoDel(){
-                    let res = relicsSim.undoDel();
-                    this.relicsList = [...relicsSim.result];
-                    this.localRecord(this.relicsList);
+                    let res = ArtifactsSim.undoDel();
+                    this.ArtifactsList = [...ArtifactsSim.result];
+                    this.localRecord(this.ArtifactsList);
                     if(res == true){
                         this.alertControl("撤销删除成功！",1500);
                     }else{
@@ -391,9 +391,9 @@
                 },
                 // 初始化全部圣遗物
                 resetAll(){
-                    relicsSim.resetAll();
-                    this.relicsList = [...relicsSim.result];
-                    this.localRecord(this.relicsList);
+                    ArtifactsSim.resetAll();
+                    this.ArtifactsList = [...ArtifactsSim.result];
+                    this.localRecord(this.ArtifactsList);
                     this.alertControl("已重置全部圣遗物~",1500);
                 },
                 // 结果保存到localstorage
@@ -416,13 +416,13 @@
                 },
                 clearStorge(){
                     localStorage.clear();
-                    this.relicsList.length = 0;
-                    relicsSim.result.length = 0;
+                    this.ArtifactsList.length = 0;
+                    ArtifactsSim.result.length = 0;
                 },
                 // 雷达图设置
                 setRadarChart(){
                     if(this.showIndex < 0) return false;
-                    let opArr = this.relicsList[this.showIndex].entry,
+                    let opArr = this.ArtifactsList[this.showIndex].entry,
                     opObj = {};
                     for(let i = 0; i < opArr.length; i++){
                         opObj[opArr[i][0]] = opArr[i][1];
@@ -441,7 +441,7 @@
                             ]
                         },
                         series: [{
-                            name: "relicRadar",
+                            name: "ArtifactRadar",
                             type: "radar",
                             areaStyle: {},
                             data: [{
