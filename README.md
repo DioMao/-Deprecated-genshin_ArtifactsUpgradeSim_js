@@ -24,7 +24,7 @@
 
 #### 1. 生成新的圣遗物数据：
 
-> ArtifactsSim.creatRelic(part,mainEntry,entry,entryRate)
+> ArtifactsSim.creatArtifact(part,mainEntry,entry,entryRate)
 
 参数说明:
 
@@ -35,7 +35,7 @@
 - **若有无效参数，则该项会随机选择。**
 
 示例：
-> ArtifactsSim.creatRelic("cup","fire",["ATKPer","critRate","critDMG","elementMastery"],[5.8,3.9,7.8,23]);
+> ArtifactsSim.creatArtifact("cup","fire",["ATKPer","critRate","critDMG","elementMastery"],[5.8,3.9,7.8,23]);
 
 返回值为对象:
 
@@ -55,7 +55,7 @@
 
 > ArtifactsSim.result
 
-存储数据为ArtifactsSim.creatRelic()返回值组合成的数组。
+存储数据为ArtifactsSim.creatArtifact()返回值组合成的数组。
 
 ####  3. 圣遗物强化
 
