@@ -171,7 +171,7 @@ ArtifactsFunction.prototype.upgrade = function (__index, __entry = "", __upLevel
             addRate = randomEntryValue(addEntry);
         this.result[__index].entry.push([addEntry, addRate]);
         this.result[__index].upgradeHistory.push([addEntry, addRate]);
-        console.log("Upgrade success,new entry is " + addEntry + " + " + addRate);
+        // console.log("Upgrade success,new entry is " + addEntry + " + " + addRate);
     } else {
         let upIndex = 0,
             upEntry = "",
