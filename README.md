@@ -30,7 +30,7 @@
 
 - part: string，可选，生成的圣遗物位置。
 - mainEntry: srting，可选，圣遗物主词条。
-- entry: Array，可选，圣遗物的副词条（3-4条）。
+- entry: Array，可选，圣遗物的副词条，至多四条，超过四条则全部随机生成。自选副词条不满三条时会随机选择可用副词条补至三条。
 - entryRate: Array，可选，圣遗物的副词条的数值。
 - **若有无效参数，则该项会随机选择。**
 
@@ -46,7 +46,8 @@
         mainEntry: "none",
         entry: [],
         initEntry: '',
-        upgradeHistory: []
+        upgradeHistory: [],
+        creationDate: Date
     }
 
 生成的数据也会保存在ArtifactsSim.result中。
@@ -74,7 +75,14 @@
 参数说明：
 
 - index: number，必选，对应ArtifactsSim.result中存储的圣遗物下标。
-- rule: 评分规则，可选，圣遗物评分规则。默认评价输出攻击。目前评分规则待完善，只有默认。
+- rule: [string | array]，可选，圣遗物评分规则。默认评分为攻击+双暴得分。
+
+当rule为字符串时，从如下数组中选择一个：
+> 
+    scoreList = ["atk","crit","def","hp","er","em"]
+    // 对应 ["攻击得分","双暴得分","防御得分","生命得分","充能得分","精通得分"]
+
+当rule为数组时，选择一个或多个组成数组，如["crit","def","hp"]。
 
 
 #### 5. 删除指定圣遗物

@@ -5,10 +5,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="原神圣遗物强化模拟_demo">
-    <meta name="author" content="DioMao">
+    <meta name="robots" content="all" />
+    <meta name="googlebot" content="all" />
+    <meta name="baiduspider" content="all" />
+    <meta name="description" content="原神圣遗物强化模拟器,Genshin Artifacts Upgrade Simulator">
+    <meta name="author" content="DioMao,https://github.com/DioMao">
+    <meta name="copyright" content="DioMao">
     <meta name="renderer" content="webkit">
-    <title>Genshin Artifacts Upgrade Simulator</title>
+    <meta name="keywords" content="genshin,artifact,simulator,原神,圣遗物,模拟器">
+    <meta name="applicable-device" content="pc,mobile">
+    <title>原神圣遗物强化模拟器 | Genshin Artifacts Upgrade Simulator</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/demo.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -60,7 +66,7 @@
                         </a>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li v-for="(entry,index2) in Artifacts.entry" class="list-group-item" @click="ArtifactUpgrade(index,entry[0])">{{ showEntryList(entry[0],entry[1]) }}
+                        <li v-for="(entry,index2) in Artifacts.entry" class="list-group-item" @click="ArtifactUpgrade(index,entry[0])">{{ formatEntry(entry[0],entry[1]) }}
                             <span class="badge bg-primary upgradeCheat" v-show="Artifacts.level<20">+</span>
                         </li>
                         <li class="list-group-item" v-if="Artifacts.entry.length == 3">——</li>
@@ -333,8 +339,8 @@
                             strRule: "default",
                             arrRule: []
                         },
-                        "test": true,
-                        "test2": false
+                        test: true,
+                        test2: false
                     },
                     alertFunc: {
                         alertShow: false,           // 是否显示提示框
@@ -342,7 +348,6 @@
                         alertClose: Function,       // 定时关闭提示框
                         alertState: "success"       // 提示框类型
                     },
-                    // radarChart: null,               // 雷达图
                     radarChartOption: Object,       // 雷达图配置
                     version: String                 // 版本信息
                 }
@@ -388,7 +393,8 @@
             computed:{
                 ArtifactScore(){
                     let mode = this.userSetting.scoreConfig.mode,
-                    index = this.showIndex;
+                    index = this.showIndex,
+                    artifact = this.ArtifactsList[index];       // 监听当前圣遗物数据，更新评分视图用
                     if(mode == "string"){
                         return ArtifactsSim.ArtifactScore(index,this.userSetting.scoreConfig.strRule).toFixed(2);
                     }else if(mode == "array"){
@@ -407,9 +413,11 @@
                 },
                 showIndex(val){
                     this.setRadarChart();
+                    if(this.showIndex >= 0) this.showDetail = JSON.parse(JSON.stringify(this.ArtifactsList[this.showIndex]));
                 },
                 ArtifactsList(val){
                     this.setRadarChart();
+                    if(this.showIndex >= 0) this.showDetail = JSON.parse(JSON.stringify(this.ArtifactsList[this.showIndex]));
                 },
                 userSetting: {
                     handler(val){
@@ -515,7 +523,6 @@
                 // 雷达图设置
                 setRadarChart(){
                     if(this.showIndex < 0) return false;
-                    this.showDetail = this.ArtifactsList[this.showIndex];
                     let opArr = this.ArtifactsList[this.showIndex].entry,
                     opObj = {};
                     for(let i = 0; i < opArr.length; i++){
@@ -573,7 +580,7 @@
                     return "";
                 },
                 // 展示界面词条文字处理
-                showEntryList(entry,value){
+                formatEntry(entry,value){
                     let percentEntry = ["critRate","critDMG","ATKPer","defPer","HPPer","energyRecharge"],
                     resEntry = this.toChinese(entry,"entry"),
                     resValue = Number(value.toFixed(2));
