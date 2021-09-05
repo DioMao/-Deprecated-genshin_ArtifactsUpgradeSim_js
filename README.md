@@ -18,7 +18,7 @@
 
 #### Demo预览（可能落后于当前版本）：
 
-> https://diomao.github.io/ArtifactsSim.github.io/
+> https://diomao.github.io/ArtifactsSimDemo
 
 ---
 
