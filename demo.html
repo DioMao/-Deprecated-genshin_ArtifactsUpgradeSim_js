@@ -373,7 +373,14 @@
                         },
                         listBriefMode: false,       // 圣遗物列表模式（details/brief）
                     },
-                    userSetting: Object,            // 用户设置
+                    userSetting: {                  // 用户设置
+                        scoreConfig:{
+                            mode: "string",
+                            strRule: "default",
+                            arrRule: []
+                        },
+                        listBriefMode: false,
+                    },
                     alertFunc: {
                         alertShow: false,           // 是否显示提示框
                         alertMsg: String,           // 提示框内容
@@ -391,7 +398,6 @@
                 this.entryValue = entryValue;
                 this.scoreList = scoreList;
                 this.version = ArtifactsSimVersion;
-                this.userSetting = JSON.parse(JSON.stringify(this.defaultSetting));
                 // 初始化自选副词条为最大值
                 for(let i in entryValue){
                     this.cusEntryRate[i] = entryValue[i][entryValue[i].length-1];
@@ -412,8 +418,10 @@
                     };
                     if(localStorage.userSetting == undefined){
                         localStorage.userSetting = JSON.stringify(this.defaultSetting);
+                        this.userSetting = JSON.parse(JSON.stringify(this.defaultSetting));
                     }else if(localStorage.userSetting != ''){
                         let settingObj = JSON.parse(localStorage.getItem("userSetting"));
+                        this.userSetting = JSON.parse(JSON.stringify(this.defaultSetting));
                         for(let key in settingObj){
                             this.userSetting[key] = settingObj[key];
                         }
