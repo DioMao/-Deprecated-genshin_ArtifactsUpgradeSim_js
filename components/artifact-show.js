@@ -117,8 +117,7 @@ app.component("artifact-show",{
 // .ArtifactShow .aTitle{
 //     height: 30px;
 //     color: #fff;
-//     font-weight: bold;
-//     line-height: 27px;
+//     line-height: 33px;
 //     padding-left: 18px;
 //     background-color: #BC6832;
 // }
@@ -136,17 +135,23 @@ app.component("artifact-show",{
 // .ArtifactShow .aHead{
 //     position: relative;
 //     color: #fff;
-//     font-size: 0.9rem;
-//     font-weight: bold;
+//     font-size: 13px;
+//     /* font-weight: bold; */
 //     height: 135px;
 //     padding: 9px 18px;
 //     background-image: linear-gradient(to bottom right,#6A5453,#E4AB52);
 // }
 // .ArtifactShow .aHead .mainEntry{
 //     position: absolute;
-//     top: 57px;
+//     top: 55px;
 //     left: 18px;
 //     color: rgb(191,173,166);
+// }
+// .ArtifactShow .aHead .mainEntryValue{
+//     position: absolute;
+//     font-size: 24px;
+//     top: 70px;
+//     left: 18px;
 // }
 // .ArtifactShow .aHead .aImg{
 //     position: absolute;
@@ -179,6 +184,7 @@ app.component("artifact-show",{
 //     background-color: #ECE5D8;
 // }
 // .ArtifactShow .aContent .badge{
+//     font-weight: 400;
 //     font-size: 0.9rem;
 //     padding: 3px 6px;
 //     background-color: rgb(57,68,79) !important;
@@ -189,7 +195,6 @@ app.component("artifact-show",{
 //     padding: 0;
 // }
 // .ArtifactShow .aContent ul li{
-//     font-weight: bold;
 //     margin-bottom: 1px;
 //     color: rgb(76,86,104);
 // }

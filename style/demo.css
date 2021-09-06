@@ -363,6 +363,7 @@ footer{
     background-color: #ECE5D8;
 }
 .ArtifactShow .aContent .badge{
+    font-weight: 400;
     font-size: 0.9rem;
     padding: 3px 6px;
     background-color: rgb(57,68,79) !important;
