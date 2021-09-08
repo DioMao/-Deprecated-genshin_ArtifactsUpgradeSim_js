@@ -20,7 +20,7 @@
 
 GIt: https://diomao.github.io/ArtifactsSimDemo
 
-国内CDN: http://ys.noworklife.cn
+国内CDN: http://ys.noworklife.cn （国内比Git快点，但是不太稳定，加载不出来就多刷新几次）
 
 ---
 
