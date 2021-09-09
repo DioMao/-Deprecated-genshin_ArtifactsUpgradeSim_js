@@ -12,7 +12,15 @@
 
 **如果觉得还凑合，就点个免费的Star吧~**
 
-为了即开即用使用html展示，用于项目中需要修改js文件。
+### 注意事项：
+
+- **下载前请注意：本模拟器使用了Vue3，因此不支持IE浏览器。**
+
+- **开发和调试时仅使用了chrome，因此不保证在所有浏览器都能正常使用。理论上来讲chrome、Edge、Firefox、QQ浏览器都能正常运行。**
+
+如果你只是想要使用模拟器，可以下载到本地后直接运行demo.html文件，或者直接访问下面的demo网站。
+
+为了即开即用，本项目没有使用webpack等构建工具。
 
 **概率数据来自于网络，仅供娱乐。**
 
@@ -22,9 +30,15 @@
 
 GIt: https://diomao.github.io/ArtifactsSimDemo
 
-国内CDN: http://ys.noworklife.cn （国内比Git快点，但是不太稳定，加载不出来就多刷新几次）
+国内CDN: http://ys.noworklife.cn （国内路线比Git快点，但是不太稳定，如果加载不出来就多刷新几次）
 
 ---
+
+#### 引入方法：
+
+直接使用<script>标签引入ArtifactsUpradeSim.js文件。
+
+在JavaScript中使用ArtifactsSim调用，方法如下：
 
 #### 1. 生成新的圣遗物数据：
 
