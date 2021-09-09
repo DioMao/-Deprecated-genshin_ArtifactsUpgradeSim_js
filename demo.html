@@ -89,7 +89,7 @@
     <script src="js/router/router.js"></script>
     <script>
         app.use(router);
-        app.mount('#vueApp');
+        router.isReady().then(() => app.mount('#vueApp'));
     </script>
 </body>
 
