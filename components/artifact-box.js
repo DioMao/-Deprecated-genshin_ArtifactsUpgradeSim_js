@@ -288,7 +288,7 @@ app.component("artifact-box",{
                     arrRule: [],
                 },
                 highScore: 35,              // 高分圣遗物标准
-                listBriefMode: false,       // 圣遗物列表模式（details/brief）
+                listBriefMode: true,        // 圣遗物列表模式（details/brief）
                 filterMain: "default"       // 主词条筛选
             },
             userSetting: {                  // 用户设置
@@ -298,7 +298,7 @@ app.component("artifact-box",{
                     arrRule: [],
                 },
                 highScore: 35,
-                listBriefMode: false,
+                listBriefMode: true,
                 filterMain: "default"
             },
             alertFunc: {
