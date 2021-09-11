@@ -5,8 +5,6 @@
  */
 "use strict";
 
-const ArtifactsSimVersion = "0.1.7";
-
 // 常量数据
 class ArtifactConst {
     constructor() {
@@ -79,6 +77,7 @@ class ArtifactConst {
  */
 class ArtifactsFunction_class {
     constructor() {
+        this.__version__ = "0.1.7";
         this.__result__ = [];
         this.count = 0;
         this.history = [];
@@ -398,7 +397,7 @@ class ArtifactsFunction_class {
     }
 
     /** 其他函数 **/
-    
+
     /**
      * 词条汉化-可调用
      * @param {String} word 需要翻译成中文的词条
@@ -525,6 +524,10 @@ class ArtifactsFunction_class {
         return (val || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
     }
 
+    get version() {
+        return this.__version__;
+    }
+
     get result() {
         return this.__result__;
     }
@@ -537,6 +540,10 @@ class ArtifactsFunction_class {
         }
     }
 }
+
+const artiConst = new ArtifactConst();
+const ArtifactsSim = new ArtifactsFunction_class();
+console.log("%cArtifactsUpgradeSim is running.Learn more: https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js", "color:rgb(144,82,41)");
 
 /** --------------------------------辅助函数-------------------------------- **/
 
@@ -551,11 +558,11 @@ function versionCheck() {
         return false;
     } else {
         if (storage.ArtifactsSimVersion == undefined) {
-            storage.ArtifactsSimVersion = ArtifactsSimVersion;
+            storage.ArtifactsSimVersion = ArtifactsSim.version;
             return true;
-        } else if (storage.ArtifactsSimVersion != ArtifactsSimVersion) {
+        } else if (storage.ArtifactsSimVersion != ArtifactsSim.version) {
             alert("模拟器版本更新，如果遇到错误，请尝试清除浏览器缓存!");
-            storage.ArtifactsSimVersion = ArtifactsSimVersion;
+            storage.ArtifactsSimVersion = ArtifactsSim.version;
             return false;
         }
     }
@@ -598,6 +605,7 @@ function formatEntry(entry, value, language = "en") {
     return resEntry + "+" + resValue;
 }
 
-const artiConst = new ArtifactConst();
-const ArtifactsSim = new ArtifactsFunction_class();
-console.log("%cArtifactsUpgradeSim is running.Learn more: https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js", "color:rgb(144,82,41)");
+// export {
+//     ArtifactsSim,
+//     artiConst
+// }
