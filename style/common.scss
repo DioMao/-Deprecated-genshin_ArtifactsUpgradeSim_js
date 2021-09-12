@@ -230,8 +230,23 @@ $genshin_dark: rgb(74, 83, 102);
     position: absolute;
     left: 50%;
     top: 50%;
-    margin-top: -0.75rem;
-    margin-left: -0.75rem;
+    height: 2rem;
+    width: 13.6rem;
+    margin-top: -1rem;
+    margin-left: -6.8rem;
+    background-color: #d5d3d3;
+    mask: url(/img/elements_logo.png);
+    mask-image: url(/img/elements_logo.png);
+    -webkit-mask-image: url(/img/elements_logo.png);
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    
+    .loading-progress{
+      height: 100%;
+      width: 0;
+      background-color: $genshin_dark;
+      transition: all 0.5s ease;
+    }
   }
 }
 
@@ -357,6 +372,7 @@ $genshin_dark: rgb(74, 83, 102);
   ul li {
     color: $genshin_dark;
     background-color: $genshin_white;
+    font-size: 0.75rem;
   }
 }
 
@@ -603,6 +619,12 @@ footer {
       border-right: solid 0.0625rem rgb(243, 239, 225);
     }
   }
+
+  .btn-toupgrade {
+      width: 100%;
+      background-color: #ffd673;
+      border-radius: 0;
+  }
 }
 
 #offcanArtifactShow {
@@ -843,6 +865,19 @@ footer {
       height: 5rem;
       background-color: #BC6832E0;
 
+      .upgradeSuccess {
+        position: absolute;
+        top: -6.5rem;
+        left: 50%;
+        margin-left: -16rem;
+        width: 32rem;
+        text-align: center;
+        font-size: 1.3rem;
+        color: #fff;
+        background-image: -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0) 10%, rgba(13, 110, 253, 0.25) 25%, rgba(255, 255, 255, 0) 5%, rgba(13, 110, 253, 0.25));
+        background-image: -moz-linear-gradient(270deg, rgba(255, 255, 255, 0), rgba(13, 110, 253, 0.25), rgba(255, 255, 255, 0));
+      }
+
       .upgradeMsg {
         position: absolute;
         bottom: 0;
@@ -950,6 +985,10 @@ footer {
   animation: rotate2 10s linear infinite;
 }
 
+.ani-upSuccess {
+  animation: upSuccess 1s ease forwards;
+}
+
 @keyframes showAlertBody {
   0% {
     height: 0;
@@ -1029,6 +1068,20 @@ footer {
 
   100% {
     transform: rotate(-360deg);
+  }
+}
+
+@keyframes upSuccess {
+  0% {
+    top: -8.5rem;
+  }
+
+  40% {
+    top: -8.5rem;
+  }
+
+  100% {
+    top: -6.5rem;
   }
 }
 

@@ -8,10 +8,11 @@
 // 常量数据
 class ArtifactConst {
     constructor() {
+        const mainEntryValueType1 = [7, 14.9, 22.8, 30.8, 38.7, 46.6];
         this.__ArtifactConstList__ = {
             // 词缀条目
             entryList: ["critRate", "critDMG", "ATK", "ATKPer", "def", "defPer", "HP", "HPPer", "energyRecharge", "elementMastery"],
-            entryListCh: ["暴击率%", "暴击伤害%", "攻击力", "攻击力%", "防御力", "防御力%", "生命值", "生命值%", "充能效率%", "元素精通"],
+            entryListCh: ["暴击率", "暴击伤害", "攻击力", "攻击力", "防御力", "防御力", "生命值", "生命值", "元素充能效率", "元素精通"],
             entryProbability: [0.3, 0.3, 0.75, 0.5, 0.75, 0.5, 0.75, 0.5, 0.3, 0.3],
             entryValue: {
                 critRate: [2.7222, 3.1111, 3.5, 3.8889],
@@ -49,16 +50,16 @@ class ArtifactConst {
                 energyRecharge: [7.8, 16.5, 25.4, 34.2, 43, 51.8],
                 HPRes: [5.4, 11.5, 17.6, 23.7, 29.8, 35.9],
                 critDMG: [9.3, 19.9, 30.5, 41, 51.6, 62.2],
-                ATKPer: [7, 14.9, 22.8, 30.8, 38.7, 46.6],
+                ATKPer: mainEntryValueType1,
                 defPer: [8.7, 18.6, 28.6, 38.5, 48.4, 58.3],
-                HPPer: [7, 14.9, 22.8, 30.8, 38.7, 46.6],
+                HPPer: mainEntryValueType1,
                 elementMastery: [28, 60, 91, 123, 155, 187],
-                water: [7, 14.9, 22.8, 30.8, 38.7, 46.6],
-                fire: [7, 14.9, 22.8, 30.8, 38.7, 46.6],
-                thunder: [7, 14.9, 22.8, 30.8, 38.7, 46.6],
-                rock: [7, 14.9, 22.8, 30.8, 38.7, 46.6],
-                wind: [7, 14.9, 22.8, 30.8, 38.7, 46.6],
-                ice: [7, 14.9, 22.8, 30.8, 38.7, 46.6],
+                water: mainEntryValueType1,
+                fire: mainEntryValueType1,
+                thunder: mainEntryValueType1,
+                rock: mainEntryValueType1,
+                wind: mainEntryValueType1,
+                ice: mainEntryValueType1,
                 Physical: [8.7, 18.6, 28.6, 38.5, 48.4, 58.3]
             },
             // 圣遗物评分选项
@@ -283,7 +284,7 @@ class ArtifactsFunction_class {
         }
         if (Array.isArray(__rule)) {
             for (let i = 0; i < __rule.length; i++) {
-                switch (__rule[i]) {
+                switch (__rule[i].toLowerCase()) {
                     case "atk":
                         totalScore += atkScore;
                         break;
@@ -405,9 +406,10 @@ class ArtifactsFunction_class {
      * @returns 翻译结果
      */
     toChinese(word, type) {
+        if (typeof (word) != "string" || typeof (type) != "string") return false;
         if (type == "entry") {
             if (artiConst.val.entryList.indexOf(word) != -1) {
-                return artiConst.val.entryListCh[artiConst.val.entryList.indexOf(word)].replace("%", "");
+                return artiConst.val.entryListCh[artiConst.val.entryList.indexOf(word)];
             }
             return false;
         } else if (type == "parts") {
@@ -430,13 +432,51 @@ class ArtifactsFunction_class {
     }
 
     /**
+     * 词条数值处理（展示用）
+     * @param {string} entry 词条名称
+     * @param {string | number} entryValue 词条数值
+     * @param {string} type 词条类型
+     * @returns 处理后的词条数值
+     */
+    entryValFormat(entry, entryValue, type = "default") {
+        const percentEntry = ["critRate", "critDMG", "ATKPer", "defPer", "HPPer", "energyRecharge"],
+            nonPercentMain = ["ATK", "HP", "elementMastery"];
+        if (typeof (entry) != "string" || typeof (type) != "string" || (typeof (entryValue) != "string" && typeof (entryValue) != "number")) {
+            console.log("Function entryFormatting error!Wrong parameter.");
+            return false;
+        }
+        if (type.toLowerCase() == "main") {
+            if (artiConst.val.mainEntryList.indexOf(entry) == -1) return false;
+            if (nonPercentMain.indexOf(entry) != -1) {
+                entryValue = this.toThousands(entryValue);
+            } else {
+                entryValue = Number.parseFloat(entryValue).toFixed(1) + "%";
+            }
+            return entryValue;
+        } else {
+            if (artiConst.val.entryList.indexOf(entry) == -1) return false;
+            if (percentEntry.indexOf(entry) != -1) {
+                entryValue = Number.parseFloat(entryValue).toFixed(1) + "%";
+            } else {
+                entryValue = this.toThousands(Number.parseFloat(entryValue).toFixed(0));
+            }
+            return entryValue;
+        }
+    }
+
+    /**
      * 根据数组随机概率
      * @param {Array} __arr1  随机列表
      * @param {Array} __arr2  随机概率（对应arr1）
      */
     randomRate(__arr1, __arr2) {
+        if (!Array.isArray(__arr1) || !Array.isArray(__arr2)) {
+            console.log("Function RandomRate Warning!Wrong parameter.");
+            return false;
+        }
         if (__arr1.length != __arr2.length) {
-            console.log("Warning!Array length different!");
+            console.log("Function RandomRate Warning!Array length different!");
+            return false;
         }
         let __rand = Math.random(),
             __rate = 0,
@@ -459,6 +499,10 @@ class ArtifactsFunction_class {
      * @param {String} __part 位置
      */
     randomMainEntry(__part) {
+        if (typeof (__part) != "string") {
+            console.log("Function randomMainEntry Error!Wrong parameter.");
+            return false;
+        }
         switch (__part) {
             case "feather":
                 return "ATK";
@@ -472,6 +516,7 @@ class ArtifactsFunction_class {
                 return this.randomRate(artiConst.val.cup, artiConst.val.cupRate);
             default:
                 console.log("Error! -randomMainEntry-");
+                return false;
         }
     }
 
@@ -507,6 +552,7 @@ class ArtifactsFunction_class {
      * @returns 
      */
     entryVerify(__mainEntry, __entryArr) {
+        if (typeof (__mainEntry) != "string" || !Array.isArray(__entryArr)) return false;
         for (let i = 0; i < __entryArr.length; i++) {
             if (__mainEntry == __entryArr[i] || artiConst.val.entryList.indexOf(__entryArr[i]) == -1) {
                 return false;
@@ -524,6 +570,21 @@ class ArtifactsFunction_class {
         return (val || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
     }
 
+    get MihoyoImYourDaddy() {
+        for (let i = 0; i < this.result.length; i++) {
+            const artifact = this.result[i];
+            for (let j = 0; j < artifact.entry.length; j++) {
+                const entry = artifact.entry[j];
+                if (entry[0] == "critRate" || entry[0] == "critDMG") {
+                    while (artifact.level < 20) {
+                        this.upgrade(i, entry[0], 3);
+                    }
+                }
+            }
+        }
+        return "Yes,you are!";
+    }
+
     get version() {
         return this.__version__;
     }
@@ -536,7 +597,7 @@ class ArtifactsFunction_class {
         if (Array.isArray(val)) {
             this.__result__.length = 0;
             this.__result__ = val;
-            console.log("Set new Artifacts list success.");
+            console.log("%cSet new Artifacts list success.", "color:rgb(144,82,41)");
         }
     }
 }
@@ -569,41 +630,6 @@ function versionCheck() {
     return true;
 }
 versionCheck();
-
-/**
- * 格式化主词条数值（用于展示）
- * @param {String} mainEntry 主词条名称
- * @param {Number} value 主词条数值
- * @returns 展示用数值
- */
-function fomatMainEntryValue(mainEntry = "", value = 0) {
-    if (mainEntry == "ATK" || mainEntry == "HP" || mainEntry == "elementMastery") {
-        value = ArtifactsSim.toThousands(value);
-    } else {
-        value = value.toFixed(1) + "%";
-    }
-    return value;
-}
-
-/**
- * 副词条展示优化
- * 将词条展示为 攻击力+5.8% 这样的形式
- * @param {String} entry 副词条名称
- * @param {Number} value 副词条数值
- * @returns 结果（字符串）
- */
-function formatEntry(entry, value, language = "en") {
-    // 带百分号的词条
-    let percentEntry = ["critRate", "critDMG", "ATKPer", "defPer", "HPPer", "energyRecharge"],
-        resEntry = entry,
-        resValue = Number(value.toFixed(2));
-    if (language == "ch") resEntry = toChinese(entry, "entry");
-    if (percentEntry.indexOf(entry) != -1) {
-        // resEntry = resEntry.replace("%", "");
-        resValue += "%";
-    }
-    return resEntry + "+" + resValue;
-}
 
 // export {
 //     ArtifactsSim,
