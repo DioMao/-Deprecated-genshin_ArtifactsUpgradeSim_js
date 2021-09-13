@@ -235,13 +235,13 @@ $genshin_dark: rgb(74, 83, 102);
     margin-top: -1rem;
     margin-left: -6.8rem;
     background-color: #d5d3d3;
-    mask: url(/img/elements_logo.png);
-    mask-image: url(/img/elements_logo.png);
-    -webkit-mask-image: url(/img/elements_logo.png);
+    mask: url(../img/elements_logo.png);
+    mask-image: url(../img/elements_logo.png);
+    -webkit-mask-image: url(../img/elements_logo.png);
     mask-size: contain;
     -webkit-mask-size: contain;
-    
-    .loading-progress{
+
+    .loading-progress {
       height: 100%;
       width: 0;
       background-color: $genshin_dark;
@@ -345,6 +345,13 @@ $genshin_dark: rgb(74, 83, 102);
   overflow: hidden;
   border: none !important;
   background-color: $genshin_white !important;
+
+  .ArtifactsTitle {
+    position: relative;
+    background-position: 4.5rem 0.9em;
+    background-size: 5rem;
+    background-repeat: no-repeat;
+  }
 
   .highScoreAward {
     position: absolute;
@@ -621,9 +628,9 @@ footer {
   }
 
   .btn-toupgrade {
-      width: 100%;
-      background-color: #ffd673;
-      border-radius: 0;
+    width: 100%;
+    background-color: #ffd673;
+    border-radius: 0;
   }
 }
 
@@ -635,6 +642,14 @@ footer {
 
 .upColor {
   color: rgb(254, 203, 49);
+}
+
+.maxBadge {
+  margin-left: 2rem;
+  background-color: rgb(255, 57, 0);
+  padding: 0.05rem 0.2rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
 }
 
 .btn-back {
@@ -874,8 +889,6 @@ footer {
         text-align: center;
         font-size: 1.3rem;
         color: #fff;
-        background-image: -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0) 10%, rgba(13, 110, 253, 0.25) 25%, rgba(255, 255, 255, 0) 5%, rgba(13, 110, 253, 0.25));
-        background-image: -moz-linear-gradient(270deg, rgba(255, 255, 255, 0), rgba(13, 110, 253, 0.25), rgba(255, 255, 255, 0));
       }
 
       .upgradeMsg {
@@ -989,6 +1002,10 @@ footer {
   animation: upSuccess 1s ease forwards;
 }
 
+.ani-badgeFlash {
+  animation: badgeFlash 2s ease infinite;
+}
+
 @keyframes showAlertBody {
   0% {
     height: 0;
@@ -1082,6 +1099,20 @@ footer {
 
   100% {
     top: -6.5rem;
+  }
+}
+
+@keyframes badgeFlash {
+  0% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.5);
+  }
+
+  100% {
+    filter: brightness(1);
   }
 }
 

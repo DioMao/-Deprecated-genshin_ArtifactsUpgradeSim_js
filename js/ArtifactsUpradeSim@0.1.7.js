@@ -64,7 +64,19 @@ class ArtifactConst {
             },
             // 圣遗物评分选项
             scoreList: ["atk", "crit", "def", "hp", "er", "em"],
-            scoreListCh: ["攻击得分", "双暴得分", "防御得分", "生命得分", "充能得分", "精通得分"]
+            scoreListCh: ["攻击得分", "双暴得分", "防御得分", "生命得分", "充能得分", "精通得分"],
+            scoreStandar: {
+                critRate: 2,
+                critDMG: 1,
+                ATK: 0.13,
+                ATKPer: 1.345,
+                def: 0.11,
+                defPer: 1.07,
+                HP: 0.0087,
+                HPPer: 1.345,
+                energyRecharge: 1.2,
+                elementMastery: 0.339
+            }
         }
     }
 
@@ -244,19 +256,6 @@ class ArtifactsFunction_class {
         if (__index >= this.__result__.length || __index < 0) {
             return 0;
         }
-        // 计分标准（待完善）
-        let scoreStandar = {
-            critRate: 2,
-            critDMG: 1,
-            ATK: 0.13,
-            ATKPer: 1.345,
-            def: 0.11,
-            defPer: 1.07,
-            HP: 0.0087,
-            HPPer: 1.345,
-            energyRecharge: 1.2,
-            elementMastery: 0.339
-        }
         let atkScore = 0,
             critScore = 0,
             defScore = 0,
@@ -267,7 +266,7 @@ class ArtifactsFunction_class {
             entryArr = this.__result__[__index].entry;
         for (let i = 0; i < entryArr.length; i++) {
             let entryNow = entryArr[i][0],
-                addScore = entryArr[i][1] * scoreStandar[entryNow];
+                addScore = entryArr[i][1] * artiConst.val.scoreStandar[entryNow];
             if (entryNow == "ATK" || entryNow == "ATKPer") {
                 atkScore += addScore;
             } else if (entryNow == "critRate" || entryNow == "critDMG") {
