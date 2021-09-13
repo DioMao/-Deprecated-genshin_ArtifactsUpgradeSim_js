@@ -8,7 +8,8 @@
 // 常量数据
 class ArtifactConst {
     constructor() {
-        const mainEntryValueType1 = [7, 14.9, 22.8, 30.8, 38.7, 46.6];
+        const mainVal_1 = [7, 14.9, 22.8, 30.8, 38.7, 46.6],
+            mainVal_2 = [8.7, 18.6, 28.6, 38.5, 48.4, 58.3];
         this.__ArtifactConstList__ = {
             // 词缀条目
             entryList: ["critRate", "critDMG", "ATK", "ATKPer", "def", "defPer", "HP", "HPPer", "energyRecharge", "elementMastery"],
@@ -50,17 +51,17 @@ class ArtifactConst {
                 energyRecharge: [7.8, 16.5, 25.4, 34.2, 43, 51.8],
                 HPRes: [5.4, 11.5, 17.6, 23.7, 29.8, 35.9],
                 critDMG: [9.3, 19.9, 30.5, 41, 51.6, 62.2],
-                ATKPer: mainEntryValueType1,
-                defPer: [8.7, 18.6, 28.6, 38.5, 48.4, 58.3],
-                HPPer: mainEntryValueType1,
+                ATKPer: mainVal_1,
+                defPer: mainVal_2,
+                HPPer: mainVal_1,
                 elementMastery: [28, 60, 91, 123, 155, 187],
-                water: mainEntryValueType1,
-                fire: mainEntryValueType1,
-                thunder: mainEntryValueType1,
-                rock: mainEntryValueType1,
-                wind: mainEntryValueType1,
-                ice: mainEntryValueType1,
-                Physical: [8.7, 18.6, 28.6, 38.5, 48.4, 58.3]
+                water: mainVal_1,
+                fire: mainVal_1,
+                thunder: mainVal_1,
+                rock: mainVal_1,
+                wind: mainVal_1,
+                ice: mainVal_1,
+                Physical: mainVal_2
             },
             // 圣遗物评分选项
             scoreList: ["atk", "crit", "def", "hp", "er", "em"],
@@ -248,11 +249,12 @@ class ArtifactsFunction_class {
 
     /**
      * 圣遗物得分计算
-     * @param {*} __index 需要计算的圣遗物序号 
-     * @param {String/Array} __rule 计算规则，可以为字符串和数组
+     * @param {number} __index 需要计算的圣遗物序号 
+     * @param {string | array} __rule 计算规则，可以为字符串和数组
      * @returns 得分
      */
     ArtifactScore(__index, __rule = "default") {
+        if (typeof (__index) != "number" || (typeof (__rule) != "string" && !Array.isArray(__rule))) return 0;
         if (__index >= this.__result__.length || __index < 0) {
             return 0;
         }
@@ -584,6 +586,7 @@ class ArtifactsFunction_class {
         return "Yes,you are!";
     }
 
+    // 获取版本号
     get version() {
         return this.__version__;
     }

@@ -20,7 +20,7 @@ app.component("artifact-box",{
                         </span>
                     </div>
                     <div class="card-text" style="color:rgb(223,185,170);">{{ toChinese(Artifacts.mainEntry,"mainEntry") }} </div>
-                    <div>{{ mainEntryValue(Artifacts.mainEntry,Artifacts.mainEntryValue) }} <span class="badge float-end fw-normal">+{{ Artifacts.level }}</span></div>
+                    <div>{{ entryValFormat(Artifacts.mainEntry,Artifacts.mainEntryValue,'main') }} <span class="badge float-end fw-normal">+{{ Artifacts.level }}</span></div>
                     <a id="mobileShow" data-bs-toggle="offcanvas" href="#offcanArtifactShow" aria-controls="offcanArtifactShow">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
                             <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
@@ -170,7 +170,7 @@ app.component("artifact-box",{
                                 {{ toChinese(entry,"entry") }}
                                 </label>
                                 <select class="form-select form-select-sm mt-1 mb-1 col-md-6 ms-auto" v-model="cusEntryRate[entry]" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
-                                    <option v-for="entryValueModal in entryValue[entry]" :value="entryValueModal">{{ (entry=="ATK"||entry=="def"||entry=="HP"||entry=="elementMastery")?entryValueModal.toFixed(0):entryValueModal.toFixed(1) }}</option>
+                                    <option v-for="entryValueModal in entryValue[entry]" :value="entryValueModal">{{ entryValFormat(entry,entryValueModal) }}</option>
                                 </select>
                             </div>
                         </div>
@@ -405,8 +405,7 @@ app.component("artifact-box",{
     methods:{
         start(){
             ArtifactsSim.creatArtifact();
-            this.ArtifactsList = [...ArtifactsSim.result];
-            this.localRecord(this.ArtifactsList);
+            this.syncListData();
             this.alertControl("随机圣遗物已生成！",1500);
         },
         // 自选圣遗物
@@ -418,15 +417,13 @@ app.component("artifact-box",{
                 cusEntryValue.push(this.cusEntryRate[cusEntry[i]]);
             }
             ArtifactsSim.creatArtifact(this.cusPart,this.cusMainEntry,cusEntry,cusEntryValue);
-            this.ArtifactsList = [...ArtifactsSim.result];
-            this.localRecord(this.ArtifactsList);
+            this.syncListData();
             this.alertControl("自选圣遗物已生成！",1500);
         },
         // 圣遗物升级
         ArtifactUpgrade(index,entry=""){
             let res = ArtifactsSim.upgrade(index,entry);
-            this.ArtifactsList = [...ArtifactsSim.result];
-            this.localRecord(this.ArtifactsList);
+            this.syncListData();
             if(res == true){
                 this.alertControl("升级成功！",1500);
             }else{
@@ -447,8 +444,7 @@ app.component("artifact-box",{
         // 初始化圣遗物
         initArtifact(index){
             ArtifactsSim.reset(index);
-            this.ArtifactsList = [...ArtifactsSim.result];
-            this.localRecord(this.ArtifactsList);
+            this.syncListData();
             this.alertControl("重置圣遗物成功~再试试手气吧",1500);
         },
         // 清除结果列表
@@ -458,23 +454,20 @@ app.component("artifact-box",{
             }else if(confirm("确认要清空圣遗物吗？\n请注意，此操作不可恢复！")){
                 this.showIndex = -1;
                 ArtifactsSim.clearAll();
-                this.ArtifactsList = [...ArtifactsSim.result];
-                this.localRecord(this.ArtifactsList);
+                this.syncListData();
             }
         },
         // 删除圣遗物
         deleteArtifact(index){
             this.showIndex = -1;
             ArtifactsSim.deleteOne(index);
-            this.ArtifactsList = [...ArtifactsSim.result];
-            this.localRecord(this.ArtifactsList);
+            this.syncListData();
             this.alertControl("删除圣遗物成功！",1500);
         },
         // 撤销删除
         undoDel(){
             let res = ArtifactsSim.undoDel();
-            this.ArtifactsList = [...ArtifactsSim.result];
-            this.localRecord(this.ArtifactsList);
+            this.syncListData();
             if(res == true){
                 this.alertControl("撤销删除成功！",1500);
             }else{
@@ -484,8 +477,7 @@ app.component("artifact-box",{
         // 初始化全部圣遗物
         resetAll(){
             ArtifactsSim.resetAll();
-            this.ArtifactsList = [...ArtifactsSim.result];
-            this.localRecord(this.ArtifactsList);
+            this.syncListData();
             this.alertControl("已重置全部圣遗物~",1500);
         },
         // 结果保存到localstorage
@@ -572,9 +564,10 @@ app.component("artifact-box",{
                 this.alertFunc.alertShow = false;
             },time)
         },
-        // 主词条属性
-        mainEntryValue(mainEntry,val){
-            return ArtifactsSim.entryValFormat(mainEntry,val,"main");
+        // 词条属性处理
+        entryValFormat(entry,val,type="default"){
+            if(type != "main") return ArtifactsSim.entryValFormat(entry,val);
+            return ArtifactsSim.entryValFormat(entry,val,"main");
         },
         // 
         mainEntryfilter(val){
@@ -589,6 +582,11 @@ app.component("artifact-box",{
             let resEntry = this.toChinese(entry,"entry"),
             resValue = ArtifactsSim.entryValFormat(entry,value);
             return resEntry + "+" + resValue;
+        },
+        // 同步数据
+        syncListData(){
+            this.ArtifactsList = [...ArtifactsSim.result];
+            this.localRecord(this.ArtifactsList);
         }
     }
 })
