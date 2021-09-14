@@ -1,6 +1,7 @@
 app.component("artifact-upgrade",{
     template: `
     <div class="containerUp">
+        <div class="fog ani-fogMove"></div>
         <demo-alert :state="alertFunc.alertState" :show="alertFunc.alertShow">{{ alertFunc.alertMsg }}</demo-alert>
         <div class="starBox">
             <div id="stars"></div>

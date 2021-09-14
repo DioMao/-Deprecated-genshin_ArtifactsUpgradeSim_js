@@ -9,7 +9,7 @@ app.component("artifact-box",{
             </select>
         </div>
         <div class="container-fluid demo-container" ref="scrollListener">
-            <div v-for="(Artifacts,index) in ArtifactsList" :id="'artifact-'+index" :class="'ArtifactsBox card rounded '+ (index==showIndex?'shadow':'shadow-sm')" v-show="(selected=='default' || selected == Artifacts.part) && (userSetting.filterMain == 'default' || userSetting.filterMain == Artifacts.mainEntry)" @click="showIndex=index">
+            <div v-for="(Artifacts,index) in ArtifactsList" :id="'artifact-'+index" class="ArtifactsBox card rounded shawdow-sm" :class="(index==showIndex?'isSelect':'')" v-show="(selected=='default' || selected == Artifacts.part) && (userSetting.filterMain == 'default' || userSetting.filterMain == Artifacts.mainEntry)" @click="changeShowIndex(index)">
                 <div class="card-body ArtifactsTitle" :style="{backgroundImage:'url(./img/A-'+ Artifacts.part + '.png)'}">
                     <div :class="'card-text fs-6 '+(ArtifactRate(index)>=userSetting.highScore?'highscore':'')">{{ toChinese(Artifacts.part,"parts") }}</div>
                     <div class="levelStar">
@@ -195,8 +195,15 @@ app.component("artifact-box",{
                     </div>
                     <div class="modal-body">
                         <div class="form-check form-switch mt-3">
-                            <input class="form-check-input" type="checkbox" id="listModeRadio" v-model="userSetting['listBriefMode']">
                             <label class="form-check-label" for="listModeRadio">使用简洁列表</label>
+                            <input class="form-check-input" type="checkbox" id="listModeRadio" v-model="userSetting['listBriefMode']">
+                        </div>
+                        <div class="mt-3">
+                            <div>副词条提升幅度（1最低，4最高）<br><span style="color:#676767;font-size:0.6rem">此选项在强化界面无效。</span></div>
+                            <select class="form-select form-select-sm" name="entryQuality" id="entryQuality" v-model="userSetting.entryQuality">
+                                <option value="-1">随机</option>
+                                <option v-for="quality in 4" :value="quality-1">{{ quality }}</option>
+                            </select>
                         </div>
                         <button type="button" class="btn btn-genshin-dark btn-sm mt-3" @click="clearStorge">清除本地数据</button>
                         <br>
@@ -268,7 +275,7 @@ app.component("artifact-box",{
         return {
             showIndex: -1,                  // 右侧圣遗物展示序号
             showDetail: Object,             // 右侧圣遗物展示详情
-            ArtifactsList: [],           // 圣遗物列表
+            ArtifactsList: [],              // 圣遗物列表
             parts: Array,                   // 圣遗物位置*自选
             mainEntryList: Array,           // 圣遗物主词条列表
             entryList: Array,               // 副词条列表
@@ -287,6 +294,7 @@ app.component("artifact-box",{
                     strRule: "default",
                     arrRule: [],
                 },
+                entryQuality: -1,           // 副词条升级品质
                 highScore: 35,              // 高分圣遗物标准
                 listBriefMode: true,        // 圣遗物列表模式（details/brief）
                 filterMain: "default"       // 主词条筛选
@@ -297,6 +305,7 @@ app.component("artifact-box",{
                     strRule: "default",
                     arrRule: [],
                 },
+                entryQuality: -1, 
                 highScore: 35,
                 listBriefMode: true,
                 filterMain: "default"
@@ -360,6 +369,7 @@ app.component("artifact-box",{
         // 监听滚动条并记录位置，返回界面时回到记录位置
         setTimeout(()=>{
             that.$refs.scrollListener.scrollTop = boxScroll;
+            this.showIndex = selectHistory;
         },1)
         this.$refs.scrollListener.addEventListener("scroll",e=>{
             boxScroll = this.$refs.scrollListener.scrollTop;
@@ -422,10 +432,12 @@ app.component("artifact-box",{
         },
         // 圣遗物升级
         ArtifactUpgrade(index,entry=""){
-            let res = ArtifactsSim.upgrade(index,entry);
+            let res = ArtifactsSim.upgrade(index,entry,this.userSetting.entryQuality),
+                qualityAlert = "";
+            if(this.userSetting.entryQuality != -1) qualityAlert = "已启用副词条自选提升幅度！"
             this.syncListData();
             if(res == true){
-                this.alertControl("升级成功！",1500);
+                this.alertControl(`升级成功！${qualityAlert}`,1500);
             }else{
                 this.alertControl("当前圣遗物已满级~",1500,"warning");
             }
@@ -500,7 +512,7 @@ app.component("artifact-box",{
         },
         // 清除本地数据
         clearStorge(){
-            if(confirm("确定要清除模拟器所有数据吗？\n执行此操作会刷新页面。")){
+            if(confirm("确定要清除模拟器所有数据吗？\n重置后会刷新页面。")){
                 localStorage.clear();
                 this.ArtifactsList.length = 0;
                 ArtifactsSim.result.length = 0;
@@ -582,6 +594,10 @@ app.component("artifact-box",{
             let resEntry = this.toChinese(entry,"entry"),
             resValue = ArtifactsSim.entryValFormat(entry,value);
             return resEntry + "+" + resValue;
+        },
+        // 修改并保存当前展示圣遗物序号
+        changeShowIndex(index){
+            this.showIndex = selectHistory = index;
         },
         // 同步数据
         syncListData(){

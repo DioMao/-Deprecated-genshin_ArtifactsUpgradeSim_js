@@ -262,8 +262,6 @@ $genshin_dark: rgb(74, 83, 102);
   height: 3.3125rem;
   background-color: #d2cab0;
   width: 100%;
-
-  // position: fixed !important;
   z-index: 10;
 
   .siteTitle {
@@ -336,6 +334,20 @@ $genshin_dark: rgb(74, 83, 102);
 }
 
 // ArtifactsBox
+
+.isSelect {
+  &:after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: .1875rem solid #fc5e5e;
+    border-radius: .25rem;
+  }
+}
 
 .ArtifactsBox {
   margin: .9375rem .625rem;
@@ -685,12 +697,26 @@ footer {
 
 .containerUp {
   position: absolute;
-  background-color: rgb(114, 71, 36);
+  background-color: rgb(125, 83, 38);
+  ;
   top: 3.5rem;
   width: 100%;
   height: calc(100% - 3.5rem);
   user-select: none;
   overflow: hidden;
+
+  .fog {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    top: 0;
+    left: -100%;
+    height: 100%;
+    width: 300%;
+    background-image: url(../img/fog.png);
+    background-size: 125rem 75rem;
+    filter: sepia(1);
+  }
 }
 
 .starBox {
@@ -830,24 +856,24 @@ footer {
 
   .flashingCircle {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 12.5rem;
-    height: 12.5rem;
+    top: 1.25rem;
+    left: 1.25rem;
+    width: 10rem;
+    height: 10rem;
     background-color: rgba(211, 169, 0, 0.2);
     border-top-left-radius: 4.5625rem;
-    border-top-right-radius: 8.25rem;
-    border-bottom-left-radius: 7.0625rem;
-    border-bottom-right-radius: 4.875rem;
+    border-top-right-radius: 5.15rem;
+    border-bottom-left-radius: 4.0625rem;
+    border-bottom-right-radius: 3.875rem;
     border: solid .125rem #ffffff;
     box-shadow: 0 0 0.25rem 0.125rem rgb(255, 255, 153);
   }
 
   .flashingCircle2 {
-    border-top-left-radius: 7.5625rem;
-    border-top-right-radius: 4.1875rem;
-    border-bottom-left-radius: 7rem;
-    border-bottom-right-radius: 5.6875rem;
+    border-top-left-radius: 5.4625rem;
+    border-top-right-radius: 3.1875rem;
+    border-bottom-left-radius: 5.7rem;
+    border-bottom-right-radius: 4.6875rem;
   }
 }
 
@@ -991,11 +1017,11 @@ footer {
 }
 
 .ani-rotate1 {
-  animation: rotate 15s linear infinite;
+  animation: rotate 10s linear infinite;
 }
 
 .ani-rotate2 {
-  animation: rotate2 10s linear infinite;
+  animation: rotate2 8s linear infinite;
 }
 
 .ani-upSuccess {
@@ -1004,6 +1030,10 @@ footer {
 
 .ani-badgeFlash {
   animation: badgeFlash 2s ease infinite;
+}
+
+.ani-fogMove {
+  animation: fogMove 30s linear infinite;
 }
 
 @keyframes showAlertBody {
@@ -1116,6 +1146,16 @@ footer {
   }
 }
 
+@keyframes fogMove {
+  0% {
+    background-position-x: 0;
+  }
+
+  100% {
+    background-position-x: 125rem;
+  }
+}
+
 // 响应式
 @media screen and (max-width: 30rem) {
   .ArtifactsBox {
@@ -1143,10 +1183,6 @@ footer {
   .UpAlertMainEntry {
     margin-right: 0.15rem;
   }
-
-  // ::-webkit-scrollbar{
-  //      display: none;
-  //  }
 }
 
 @media screen and (max-width: 51.1875rem) {

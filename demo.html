@@ -16,14 +16,14 @@
     <meta name="applicable-device" content="pc,mobile">
     <title>原神圣遗物强化模拟器 | Genshin Artifacts Upgrade Simulator</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="style/common.min.css">
+    <link rel="stylesheet" href="style/common.min.css?date=20210914">
     <link rel="stylesheet" href="style/stars.css">
     <link rel="stylesheet" href="style/bootstrap.min.css">
     <script src="js/echarts.min.js"></script>
     <script src="js/vue@3.2.4.js"></script>
     <script src="js/vue-router.global.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/ArtifactsUpradeSim@0.1.7.js"></script>
+    <script src="js/ArtifactsUpradeSim@0.1.7.js?date=20210914"></script>
     <script src="js/axios.min.js"></script>
 </head>
 
@@ -77,7 +77,8 @@
 
     <script>
         const simType = "local";
-        var boxScroll = 0;
+        var boxScroll = 0,
+            selectHistory = -1;
         const app = Vue.createApp({
             data() {
                 return {
@@ -88,22 +89,22 @@
             mounted() {
                 // 预加载图片(同时控制进度条)
                 let that = this;
-                if(simType == "local"){
-                    that.$nextTick(function(){
-                       this.isLoad = true;
+                if (simType == "local") {
+                    that.$nextTick(function () {
+                        this.isLoad = true;
                     });
                     // that.loadProgress = 50;
                     // setTimeout(()=>{
                     //     that.loadProgress = 90;
                     // },200)
-                }else{
+                } else {
                     axios.all([this.preLoadImg(), this.preLoadImg2()])
                         .then(axios.spread((res, res2) => {
-    
+
                         })).catch((err => {
                             console.log(err);
                         }))
-                }       
+                }
             },
             watch: {
                 loadProgress(val) {
