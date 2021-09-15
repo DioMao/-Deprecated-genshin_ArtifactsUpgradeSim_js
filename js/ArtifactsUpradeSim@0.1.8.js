@@ -1,5 +1,5 @@
 /**
- * ArtifactsUpgradeSim v0.1.7
+ * ArtifactsUpgradeSim v0.1.8
  * Copyrigth 2021-2022 DioMao (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/graphs/contributors)
  * Licensed under MIT (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/blob/main/LICENSE)
  */
@@ -8,7 +8,8 @@
 // 常量数据
 class ArtifactConst {
     constructor() {
-        const mainEntryValueType1 = [7, 14.9, 22.8, 30.8, 38.7, 46.6];
+        const mainVal_1 = [7, 14.9, 22.8, 30.8, 38.7, 46.6],
+            mainVal_2 = [8.7, 18.6, 28.6, 38.5, 48.4, 58.3];
         this.__ArtifactConstList__ = {
             // 词缀条目
             entryList: ["critRate", "critDMG", "ATK", "ATKPer", "def", "defPer", "HP", "HPPer", "energyRecharge", "elementMastery"],
@@ -50,17 +51,17 @@ class ArtifactConst {
                 energyRecharge: [7.8, 16.5, 25.4, 34.2, 43, 51.8],
                 HPRes: [5.4, 11.5, 17.6, 23.7, 29.8, 35.9],
                 critDMG: [9.3, 19.9, 30.5, 41, 51.6, 62.2],
-                ATKPer: mainEntryValueType1,
-                defPer: [8.7, 18.6, 28.6, 38.5, 48.4, 58.3],
-                HPPer: mainEntryValueType1,
+                ATKPer: mainVal_1,
+                defPer: mainVal_2,
+                HPPer: mainVal_1,
                 elementMastery: [28, 60, 91, 123, 155, 187],
-                water: mainEntryValueType1,
-                fire: mainEntryValueType1,
-                thunder: mainEntryValueType1,
-                rock: mainEntryValueType1,
-                wind: mainEntryValueType1,
-                ice: mainEntryValueType1,
-                Physical: [8.7, 18.6, 28.6, 38.5, 48.4, 58.3]
+                water: mainVal_1,
+                fire: mainVal_1,
+                thunder: mainVal_1,
+                rock: mainVal_1,
+                wind: mainVal_1,
+                ice: mainVal_1,
+                Physical: mainVal_2
             },
             // 圣遗物评分选项
             scoreList: ["atk", "crit", "def", "hp", "er", "em"],
@@ -78,6 +79,18 @@ class ArtifactConst {
                 elementMastery: 0.339
             }
         }
+        // 设置只读
+        const nope = () => {
+                throw new Error("Error!This data is read only!")
+            },
+            read_only = (obj) => new Proxy(obj, {
+                set: nope,
+                defineProperty: nope,
+                deleteProperty: nope,
+                preventExtensions: nope,
+                setPrototypeOf: nope
+            });
+        this.__ArtifactConstList__ = read_only(this.__ArtifactConstList__);
     }
 
     get val() {
@@ -90,23 +103,28 @@ class ArtifactConst {
  */
 class ArtifactsFunction_class {
     constructor() {
-        this.__version__ = "0.1.7";
-        this.__result__ = [];
-        this.count = 0;
+        this.__version__ = "0.1.8";
+        this.__AUSList__ = [];
         this.history = [];
-        this.backup = [];
         this.deleteHistory = [];
+        this.suitList = [];
+        this.__maxResults__ = 1000;
+        this.localStorageKey = "AUSLocalList";
     }
 
     /**
      * 生成初始数据
-     * @param {String} __part 指定位置，可为空
-     * @param {String} __main 指定主词条，可为空
-     * @param {Array} __entryArr 指定词条（至多四条），可为空
-     * @param {Array} __entryRate 副词条数值（对应自选副词条），可为空
+     * @param {string} __part 指定位置，可为空
+     * @param {string} __main 指定主词条，可为空
+     * @param {array} __entryArr 指定词条（至多四条），可为空
+     * @param {array} __entryRate 副词条数值（对应自选副词条），可为空
      * @returns {Object} 对象newArtifacts
      */
     creatArtifact(__part = "", __main = "", __entry = [], __entryRate = []) {
+        if (this.__AUSList__.length >= this.__maxResults__) {
+            console.log(`Warning - The maximum length of the artifacts list is ${this.__maxResults__}.`);
+            return false;
+        }
         let newArtifacts = {
                 level: 0,
                 part: "none",
@@ -172,22 +190,22 @@ class ArtifactsFunction_class {
         // 保存初始状态
         newArtifacts.initEntry = JSON.stringify(newArtifacts.entry);
         // 保存结果
-        this.__result__.push(newArtifacts);
-        this.count++;
+        this.__AUSList__.push(newArtifacts);
         // console.log(newArtifacts);
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
         return newArtifacts;
     }
 
     /**
      * 升级强化
-     * @param {Number} __index 序号
-     * @param {String} __entry 指定强化的词条（默认空值）
-     * @param {Number} __upLevel 强化数值的级别(0-3，3最高)
+     * @param {number} __index 序号
+     * @param {string} __entry 指定强化的词条（默认空值）
+     * @param {number} __upLevel 强化数值的级别(0-3，3最高)
      * @returns 升级结果
      */
     upgrade(__index, __entry = "", __upLevel = -1) {
-        if (__index >= this.__result__.length || __index < 0) return false;
-        let currentArtifact = this.__result__[__index],
+        if (__index >= this.__AUSList__.length || __index < 0) return false;
+        let currentArtifact = this.__AUSList__[__index],
             currentEntry = [],
             currentEntryList = [],
             currentEntryRate = [];
@@ -212,7 +230,6 @@ class ArtifactsFunction_class {
                 addRate = this.randomEntryValue(addEntry);
             currentArtifact.entry.push([addEntry, addRate]);
             currentArtifact.upgradeHistory.push([addEntry, addRate]);
-            // console.log("Upgrade success,new entry is " + addEntry + " + " + addRate);
         } else {
             let upIndex = 0,
                 upEntry = "",
@@ -243,17 +260,19 @@ class ArtifactsFunction_class {
         currentArtifact.level += 4;
         // 增加主属性
         currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][currentArtifact.level / 4];
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
         return true;
     }
 
     /**
      * 圣遗物得分计算
-     * @param {*} __index 需要计算的圣遗物序号 
-     * @param {String/Array} __rule 计算规则，可以为字符串和数组
+     * @param {number} __index 需要计算的圣遗物序号 
+     * @param {string | array} __rule 计算规则，可以为字符串和数组
      * @returns 得分
      */
     ArtifactScore(__index, __rule = "default") {
-        if (__index >= this.__result__.length || __index < 0) {
+        if (typeof (__index) != "number" || (typeof (__rule) != "string" && !Array.isArray(__rule))) return 0;
+        if (__index >= this.__AUSList__.length || __index < 0) {
             return 0;
         }
         let atkScore = 0,
@@ -263,7 +282,7 @@ class ArtifactsFunction_class {
             rechargeScore = 0,
             EMScore = 0,
             totalScore = 0,
-            entryArr = this.__result__[__index].entry;
+            entryArr = this.__AUSList__[__index].entry;
         for (let i = 0; i < entryArr.length; i++) {
             let entryNow = entryArr[i][0],
                 addScore = entryArr[i][1] * artiConst.val.scoreStandar[entryNow];
@@ -327,29 +346,30 @@ class ArtifactsFunction_class {
             }
         }
         return totalScore;
-        // return {"atkScore":atkScore,"critScore":critScore,"defScore":defScore,"HPScore":HPScore,"rechargeScore":rechargeScore,"EMScore":EMScore};
     }
 
     /**
      * 圣遗物重置初始状态
-     * @param {Number} __index 序号
+     * @param {number} __index 序号
      */
     reset(__index) {
-        let currentArtifact = this.__result__[__index];
+        let currentArtifact = this.__AUSList__[__index];
         currentArtifact.entry.length = 0;
         currentArtifact.entry = JSON.parse(currentArtifact.initEntry);
         currentArtifact.upgradeHistory.length = 0;
         currentArtifact.level = 0;
         currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][0];
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
     }
 
     /**
      * 重置全部圣遗物状态
      */
     resetAll() {
-        for (let i = 0; i < this.__result__.length; i++) {
+        for (let i = 0; i < this.__AUSList__.length; i++) {
             this.reset(i);
         }
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
     }
 
     /**
@@ -357,18 +377,18 @@ class ArtifactsFunction_class {
      * @param {number} __del 要删除的遗物序号
      */
     deleteOne(__del) {
-        this.deleteHistory.push(this.__result__.splice(__del, 1)[0]);
-        this.count--;
+        this.deleteHistory.push(this.__AUSList__.splice(__del, 1)[0]);
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
     }
 
     /**
      * 批量删除指定数据
-     * @param {Array} __delArr 要删除的遗物序号（数组）
+     * @param {array} __delArr 要删除的遗物序号（数组）
      */
     batchDelete(__delArr) {
         __delArr.sort((a, b) => a - b);
         for (let i = __delArr.length - 1; i >= 0; i--) {
-            this.deleteHistory.push(this.__result__.splice(__delArr[i], 1)[0]);
+            this.deleteHistory.push(this.__AUSList__.splice(__delArr[i], 1)[0]);
         }
     }
 
@@ -376,11 +396,8 @@ class ArtifactsFunction_class {
      * 清空数据
      */
     clearAll() {
-        // 备份原数据
-        if (this.backup.length != 0) this.backup.length = 0;
-        this.backup = JSON.parse(JSON.stringify(this.__result__));
-        this.__result__.length = 0;
-        this.count = 0;
+        this.__AUSList__.length = 0;
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
     }
 
     /**
@@ -392,16 +409,22 @@ class ArtifactsFunction_class {
             console.log("Undo false, history not found.");
             return false;
         }
-        this.__result__.push(this.deleteHistory.pop());
+        this.__AUSList__.push(this.deleteHistory.pop());
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
         return true;
+    }
+
+    /** 圣遗物套装 **/
+    newSuit() {
+        
     }
 
     /** 其他函数 **/
 
     /**
      * 词条汉化-可调用
-     * @param {String} word 需要翻译成中文的词条
-     * @param {String} type 词条的类型
+     * @param {string} word 需要翻译成中文的词条
+     * @param {string} type 词条的类型
      * @returns 翻译结果
      */
     toChinese(word, type) {
@@ -441,7 +464,6 @@ class ArtifactsFunction_class {
         const percentEntry = ["critRate", "critDMG", "ATKPer", "defPer", "HPPer", "energyRecharge"],
             nonPercentMain = ["ATK", "HP", "elementMastery"];
         if (typeof (entry) != "string" || typeof (type) != "string" || (typeof (entryValue) != "string" && typeof (entryValue) != "number")) {
-            console.log("Function entryFormatting error!Wrong parameter.");
             return false;
         }
         if (type.toLowerCase() == "main") {
@@ -465,18 +487,12 @@ class ArtifactsFunction_class {
 
     /**
      * 根据数组随机概率
-     * @param {Array} __arr1  随机列表
-     * @param {Array} __arr2  随机概率（对应arr1）
+     * @param {array} __arr1  随机列表
+     * @param {array} __arr2  随机概率（对应arr1）
      */
     randomRate(__arr1, __arr2) {
-        if (!Array.isArray(__arr1) || !Array.isArray(__arr2)) {
-            console.log("Function RandomRate Warning!Wrong parameter.");
-            return false;
-        }
-        if (__arr1.length != __arr2.length) {
-            console.log("Function RandomRate Warning!Array length different!");
-            return false;
-        }
+        if (!Array.isArray(__arr1) || !Array.isArray(__arr2)) throw new Error("Function RandomRate Warning!Wrong parameter.");
+        if (__arr1.length != __arr2.length) throw new Error("Function RandomRate Warning!Array length different!");
         let __rand = Math.random(),
             __rate = 0,
             __totalRate = 0;
@@ -495,13 +511,10 @@ class ArtifactsFunction_class {
 
     /**
      * 随机主词条
-     * @param {String} __part 位置
+     * @param {string} __part 位置
      */
     randomMainEntry(__part) {
-        if (typeof (__part) != "string") {
-            console.log("Function randomMainEntry Error!Wrong parameter.");
-            return false;
-        }
+        if (typeof (__part) != "string") throw new Error("Function randomMainEntry Error!Wrong parameter(Not string).");
         switch (__part) {
             case "feather":
                 return "ATK";
@@ -521,20 +534,21 @@ class ArtifactsFunction_class {
 
     /** 
      * 随机副词条数值
-     * @param {String} __entry 词条名称
+     * @param {string} __entry 词条名称
      */
     randomEntryValue(__entry) {
+        if (typeof (__entry) != "string") throw new Error("Function randomEntryValue Error!Wrong parameter(Not string).");
         return artiConst.val.entryValue[__entry][Math.floor(Math.random() * artiConst.val.entryValue[__entry].length)];
     }
 
     /**
      * 主词条合规验证
-     * @param {String} __part 位置
-     * @param {String} __main 主词条
-     * @returns {Boolean} true/false
+     * @param {string} __part 位置
+     * @param {string} __main 主词条
+     * @returns {boolean} true/false
      */
     mainEntryVerify(__part, __main) {
-        if (typeof (__part) != "string" || typeof (__main) != "string") return false;
+        if (typeof (__part) != "string" || typeof (__main) != "string") throw new Error("Function mainEntryVerify Error!Wrong parameter(Not string).");
         if (artiConst.val.parts.indexOf(__part) != -1 && artiConst.val.mainEntryList.indexOf(__main) != -1) {
             if (artiConst.val[__part].indexOf(__main) != -1) {
                 return true;
@@ -546,12 +560,12 @@ class ArtifactsFunction_class {
 
     /**
      * 自选副词条合规验证
-     * @param {String} __mainEntry 主词条
-     * @param {Array} __entryArr 副词条数组
+     * @param {string} __mainEntry 主词条
+     * @param {array} __entryArr 副词条数组
      * @returns 
      */
     entryVerify(__mainEntry, __entryArr) {
-        if (typeof (__mainEntry) != "string" || !Array.isArray(__entryArr)) return false;
+        if (typeof (__mainEntry) != "string" || !Array.isArray(__entryArr)) throw new Error("Function entryVerify Error!Wrong parameter.");
         for (let i = 0; i < __entryArr.length; i++) {
             if (__mainEntry == __entryArr[i] || artiConst.val.entryList.indexOf(__entryArr[i]) == -1) {
                 return false;
@@ -562,7 +576,7 @@ class ArtifactsFunction_class {
 
     /**
      * 数字千位分割（加逗号）
-     * @param {Number | String} val 待转化的数字
+     * @param {number | string} val 待转化的数字
      * @returns 转换结果（字符串）
      */
     toThousands(val) {
@@ -570,8 +584,8 @@ class ArtifactsFunction_class {
     }
 
     get MihoyoImYourDaddy() {
-        for (let i = 0; i < this.result.length; i++) {
-            const artifact = this.result[i];
+        for (let i = 0; i < this.AUSList.length; i++) {
+            const artifact = this.AUSList[i];
             for (let j = 0; j < artifact.entry.length; j++) {
                 const entry = artifact.entry[j];
                 if (entry[0] == "critRate" || entry[0] == "critDMG") {
@@ -584,18 +598,40 @@ class ArtifactsFunction_class {
         return "Yes,you are!";
     }
 
+    /**
+     * localStorage存储
+     * @param {string} key 键
+     * @param {array | srting | object} val 值
+     */
+    setLocalStorage(key,val) {
+        if(typeof(val) == "object") val = JSON.stringify(val);
+        if(typeof(val) == "number") val = val.toString();
+        let storage = window.localStorage;
+        if(!storage){
+            throw new Error("The browser does not support LocalStorage.");
+        } else {
+            storage.setItem(key,val);
+        }
+    }
+
+    // 获取版本号
     get version() {
         return this.__version__;
     }
 
-    get result() {
-        return this.__result__;
+    get AUSList() {
+        return this.__AUSList__;
     }
 
-    set result(val) {
+    set AUSList(val) {
         if (Array.isArray(val)) {
-            this.__result__.length = 0;
-            this.__result__ = val;
+            if (val.length > this.__maxResults__) {
+                val.length = this.__maxResults__;
+                console.log(`Warning - The maximum length of the artifacts list is ${this.__maxResults__}.`);
+            }
+            this.__AUSList__.length = 0;
+            this.__AUSList__ = val;
+            this.setLocalStorage(this.localStorageKey,this.__AUSList__);
             console.log("%cSet new Artifacts list success.", "color:rgb(144,82,41)");
         }
     }
@@ -608,14 +644,14 @@ console.log("%cArtifactsUpgradeSim is running.Learn more: https://github.com/Dio
 /** --------------------------------辅助函数-------------------------------- **/
 
 /**
- * 模拟器版本检查
+ * 模拟器版本检查+读取localStorage
  * @returns 检查结果
  */
 function versionCheck() {
     let storage = window.localStorage;
+    let localList = storage[ArtifactsSim.localStorageKey];
     if (!storage) {
-        alert("浏览器不支持localstorage");
-        return false;
+        throw new Error("The browser does not support LocalStorage.")
     } else {
         if (storage.ArtifactsSimVersion == undefined) {
             storage.ArtifactsSimVersion = ArtifactsSim.version;
@@ -624,6 +660,13 @@ function versionCheck() {
             alert("模拟器版本更新，如果遇到错误，请尝试清除浏览器缓存!");
             storage.ArtifactsSimVersion = ArtifactsSim.version;
             return false;
+        }
+    }
+    if(localList != undefined && localList != "[]" && localList != ""){
+        try {
+            ArtifactsSim.AUSList = JSON.parse(localList);
+        } catch (error) {
+            console.log("%cSet new Artifacts list fail.", "color:rgb(144,82,41)");
         }
     }
     return true;
