@@ -3,13 +3,19 @@ app.component("artifact-box",{
     <div class="main-container">
         <demo-alert :state="alertFunc.alertState" :show="alertFunc.alertShow">{{ alertFunc.alertMsg }}</demo-alert>
         <div class="selectBox d-flex">
-            <select class="form-select" aria-label="Default select example" v-model="selected">
+            <select class="form-select" aria-label="Default select example" v-model="userSetting.filterPart">
                 <option selected value="default">显示全部</option>
-                <option :value="part" v-for="part in parts">{{ toChinese(part,"parts") }}</option>
+                <option :value="part" v-for="part in artiConst.val.parts">{{ toChinese(part,"parts") }}</option>
             </select>
         </div>
         <div class="container-fluid demo-container" ref="scrollListener">
-            <div v-for="(Artifacts,index) in ArtifactsList" :id="'artifact-'+index" class="ArtifactsBox card rounded shawdow-sm" :class="(index==showIndex?'isSelect':'')" v-show="(selected=='default' || selected == Artifacts.part) && (userSetting.filterMain == 'default' || userSetting.filterMain == Artifacts.mainEntry)" @click="changeShowIndex(index)">
+            <div class="filterBoxFill" v-show="userSetting.filterMain!='default'||userSetting.filterPart!='default'"></div>
+            <div class="filterBox" :class="(userSetting.filterMain!='default'||userSetting.filterPart!='default')?'filterBoxShow':'filterBoxHide'">
+                <div style="display:inline-block;">筛选:</div>
+                <div class="filterMain" v-show="userSetting.filterMain!='default'" @click="userSetting.filterMain='default'"> {{ (userSetting.filterMain=="ATK" || userSetting.filterMain == "HP")?"固定":"" }}{{ toChinese(userSetting.filterMain,"mainEntry") }}</div>
+                <div class="filterPart" v-show="userSetting.filterPart!='default'" @click="userSetting.filterPart='default'"> {{ toChinese(userSetting.filterPart,"parts") }}</div>
+            </div>
+            <div v-for="(Artifacts,index) in ArtifactsList" :ref="'artifact-'+'index'" :id="'artifact-'+index" class="ArtifactsBox card rounded shawdow-sm" :class="(index==showIndex?'isSelect':'')" v-show="(userSetting.filterPart=='default' || userSetting.filterPart == Artifacts.part) && (userSetting.filterMain == 'default' || userSetting.filterMain == Artifacts.mainEntry)" @click="changeShowIndex(index)">
                 <div class="card-body ArtifactsTitle" :style="{backgroundImage:'url(./img/A-'+ Artifacts.part + '.png)'}">
                     <div :class="'card-text fs-6 '+(ArtifactRate(index)>=userSetting.highScore?'highscore':'')">{{ toChinese(Artifacts.part,"parts") }}</div>
                     <div class="levelStar">
@@ -89,7 +95,7 @@ app.component("artifact-box",{
                 </button>
                 <ul class="dropdown-menu filterList" aria-labelledby="filter">
                     <li><a class="dropdown-item" href="#" @click="mainEntryfilter('default')" :style="{background:(userSetting.filterMain=='default'?'rgb(85,92,107)':'inherit')}">默认</a></li>
-                    <li v-for="mainEntryF in mainEntryList"><a class="dropdown-item" href="#" @click="mainEntryfilter(mainEntryF)" :style="{background:(userSetting.filterMain==mainEntryF?'#596379':'inherit')}">{{ (mainEntryF=="ATK" || mainEntryF == "HP")?"固定":"" }}{{ toChinese(mainEntryF,"mainEntry") }}</a></li>
+                    <li v-for="mainEntryF in artiConst.val.mainEntryList"><a class="dropdown-item" href="#" @click="mainEntryfilter(mainEntryF)" :style="{background:(userSetting.filterMain==mainEntryF?'#596379':'inherit')}">{{ (mainEntryF=="ATK" || mainEntryF == "HP")?"固定":"" }}{{ toChinese(mainEntryF,"mainEntry") }}</a></li>
                 </ul>
                 <button id="start" @click="start" class="btn btn-genshin"><span class="circleinbox"></span>随机</button>
                 <button class="btn btn-genshin" data-bs-toggle="modal" data-bs-target="#cusArtifact"><span class="squareinbox"></span>自选</button>
@@ -156,7 +162,7 @@ app.component("artifact-box",{
                     <div class="modal-body">
                         <label for="cutArtifactPart" class="form-label">位置</label>
                         <select id="cutArtifactPart" class="form-select form-select-sm mb-3" v-model="cusPart" @change="cusEntry.length=0;cusMainEntry=''">
-                            <option v-for="part in parts" :value="part">{{ toChinese(part,"parts") }}</option>
+                            <option v-for="part in artiConst.val.parts" :value="part">{{ toChinese(part,"parts") }}</option>
                         </select>
                         <label class="form-label" v-show="cusPart!='default'&&cusPart!=''">主属性</label>
                         <select class="form-select form-select-sm mb-3" v-if="cusPart!='default'&&cusPart!=''" v-model="cusMainEntry" @change="cusEntry.length=0">
@@ -164,13 +170,13 @@ app.component("artifact-box",{
                         </select>
                         <label class="form-label" v-show="cusPart!='default'&&cusMainEntry!=''">副词条选择</label>
                         <div class="d-flex justify-content-between flex-wrap">
-                            <div class="form-check mb-2" style="width:40%;" v-for="entry in entryList" v-show="cusPart!='default'&&cusMainEntry!=''&&cusMainEntry!=entry">
+                            <div class="form-check mb-2" style="width:40%;" v-for="entry in artiConst.val.entryList" v-show="cusPart!='default'&&cusMainEntry!=''&&cusMainEntry!=entry">
                                 <input class="form-check-input" v-model="cusEntry" type="checkbox" :value="entry" :id="entry+'Check'" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
                                 <label class="form-check-label" :for="entry+'Check'">
                                 {{ toChinese(entry,"entry") }}
                                 </label>
                                 <select class="form-select form-select-sm mt-1 mb-1 col-md-6 ms-auto" v-model="cusEntryRate[entry]" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
-                                    <option v-for="entryValueModal in entryValue[entry]" :value="entryValueModal">{{ entryValFormat(entry,entryValueModal) }}</option>
+                                    <option v-for="entryValueModal in artiConst.val.entryValue[entry]" :value="entryValueModal">{{ entryValFormat(entry,entryValueModal) }}</option>
                                 </select>
                             </div>
                         </div>
@@ -224,6 +230,10 @@ app.component("artifact-box",{
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
+                            <label for="highScoreRange" class="form-label">高分圣遗物标准: {{ userSetting.highScore }}</label>
+                            <input type="range" class="form-range" min="20" max="50" id="highScoreRange" v-model="userSetting.highScore">
+                        </div>
+                        <div class="mb-3">
                             <input class="form-check-input" type="radio" name="scoreMode" id="scoreMode1" value="string" v-model="userSetting.scoreConfig.mode">
                             <label class="form-check-label me-5" for="scoreMode1">
                                 预设模式
@@ -236,11 +246,11 @@ app.component("artifact-box",{
                         <div v-show="userSetting.scoreConfig.mode=='string'">
                             <select class="form-select form-select-sm" name="scoreString" id="scoreString" v-model="userSetting.scoreConfig.strRule">
                                 <option value="default">默认</option>
-                                <option v-for="config in scoreList" :value="config">{{ toChinese(config,"score") }}</option>
+                                <option v-for="config in artiConst.val.scoreList" :value="config">{{ toChinese(config,"score") }}</option>
                             </select>
                         </div>
                         <div class="justify-content-between flex-wrap" style="display:flex;" v-show="userSetting.scoreConfig.mode=='array'">
-                            <div class="form-check" style="width:40%;" v-for="config in scoreList">
+                            <div class="form-check" style="width:40%;" v-for="config in artiConst.val.scoreList">
                                 <input class="form-check-input" type="checkbox" :value="config" :id="'score-'+config" v-model="userSetting.scoreConfig.arrRule">
                                 <label class="form-check-label" :for="'score-'+config">
                                     {{ toChinese(config,"score") }}
@@ -273,22 +283,17 @@ app.component("artifact-box",{
     `,
     data() {
         return {
+            artiConst: Object,              // 圣遗物常量表
             showIndex: -1,                  // 右侧圣遗物展示序号
             showDetail: Object,             // 右侧圣遗物展示详情
             ArtifactsList: [],              // 圣遗物列表
-            parts: Array,                   // 圣遗物位置*自选
-            mainEntryList: Array,           // 圣遗物主词条列表
-            entryList: Array,               // 副词条列表
-            selected: "default",            // 根据位置筛选结果
             cusCloseSwitch: true,           // 自选圣遗物-生成后是否关闭modal窗
             cusPart: "",                    // 自选圣遗物位置
             cusMainEntry: "",               // 自选圣遗物主词条
             cusEntry: [],                   // 自选圣遗物副词条
             cusEntryRate: Object,           // 自选圣遗物副词条数值
             cusEntryList: Object,           // 自选圣遗物副词对照表
-            entryValue: Object,             // 自选圣遗物副词数值对照表
-            scoreList: Array,               // 圣遗物得分选项表
-            defaultSetting: {               // 默认设置
+            userSetting: {                  // 用户设置
                 scoreConfig:{               // 圣遗物得分设置
                     mode: "string",
                     strRule: "default",
@@ -297,19 +302,10 @@ app.component("artifact-box",{
                 entryQuality: -1,           // 副词条升级品质
                 highScore: 35,              // 高分圣遗物标准
                 listBriefMode: true,        // 圣遗物列表模式（details/brief）
-                filterMain: "default"       // 主词条筛选
+                filterMain: "default",      // 主词条筛选
+                filterPart: "default"       // 位置筛选
             },
-            userSetting: {                  // 用户设置
-                scoreConfig:{
-                    mode: "string",
-                    strRule: "default",
-                    arrRule: [],
-                },
-                entryQuality: -1, 
-                highScore: 35,
-                listBriefMode: true,
-                filterMain: "default"
-            },
+            defaultSetting: "",             // 初始设置
             alertFunc: {
                 alertShow: false,           // 是否显示提示框
                 alertMsg: String,           // 提示框内容
@@ -321,9 +317,7 @@ app.component("artifact-box",{
         }
     },
     created(){
-        this.parts = artiConst.val.parts;
-        this.mainEntryList = artiConst.val.mainEntryList;
-        this.entryList = artiConst.val.entryList;
+        this.artiConst = artiConst;
         this.cusEntryList = {
             feather: artiConst.val.feather,
             flower: artiConst.val.flower,
@@ -331,9 +325,8 @@ app.component("artifact-box",{
             hat: artiConst.val.hat,
             cup: artiConst.val.cup
         };
-        this.entryValue = artiConst.val.entryValue;
-        this.scoreList = artiConst.val.scoreList;
         this.version = ArtifactsSim.version;
+        this.defaultSetting = JSON.stringify(this.userSetting);
         // 初始化自选副词条为最大值
         for(let i in artiConst.val.entryValue){
             this.cusEntryRate[i] = artiConst.val.entryValue[i][artiConst.val.entryValue[i].length-1];
@@ -342,28 +335,18 @@ app.component("artifact-box",{
     mounted(){
         var that = this;
         // 初始化时列表数据保持一致
-        if(this.ArtifactsList.length == 0 && ArtifactsSim.result.length != 0){
-            this.ArtifactsList = [...ArtifactsSim.result];
+        if(this.ArtifactsList.length == 0 && ArtifactsSim.AUSList.length != 0){
+            this.ArtifactsList = [...ArtifactsSim.AUSList];
         }
         if(!window.localStorage){
             alert("浏览器不支持localstorage");
             return false;
         }else{
-            if(localStorage.localRecord == undefined){
-                localStorage.localRecord = [];
-            }else if(localStorage.localRecord != '' && localStorage.localRecord != "[]" && this.ArtifactsList.length == 0){
-                ArtifactsSim.result = JSON.parse(localStorage.getItem("localRecord"));
-                this.ArtifactsList = [...ArtifactsSim.result];
-            };
             if(localStorage.userSetting == undefined){
-                localStorage.userSetting = JSON.stringify(this.defaultSetting);
-                this.userSetting = JSON.parse(JSON.stringify(this.defaultSetting));
+                localStorage.userSetting = this.defaultSetting;
             }else if(localStorage.userSetting != ''){
                 let settingObj = JSON.parse(localStorage.getItem("userSetting"));
-                this.userSetting = JSON.parse(JSON.stringify(this.defaultSetting));
-                for(let key in settingObj){
-                    this.userSetting[key] = settingObj[key];
-                }
+                Object.assign(this.userSetting,settingObj);
             };
         }
         // 监听滚动条并记录位置，返回界面时回到记录位置
@@ -371,9 +354,11 @@ app.component("artifact-box",{
             that.$refs.scrollListener.scrollTop = boxScroll;
             this.showIndex = selectHistory;
         },1)
+        // 滚动监听
         this.$refs.scrollListener.addEventListener("scroll",e=>{
-            boxScroll = this.$refs.scrollListener.scrollTop;
-            // console.log('相对距离', boxScroll);
+            // 记录相对高度（boxScroll为全局变量）
+            const scroll = this.$refs.scrollListener;
+            boxScroll = scroll.scrollTop;
         })
     },
     computed:{
@@ -391,12 +376,6 @@ app.component("artifact-box",{
         }
     },
     watch:{
-        selected(val){
-            if(this.showIndex < 0) return false;
-            if(val != "default" && this.ArtifactsList[this.showIndex].part != val){
-                this.showIndex = -1;
-            }
-        },
         showIndex(val){
             this.setRadarChart();
             if(this.showIndex >= 0) this.showDetail = JSON.parse(JSON.stringify(this.ArtifactsList[this.showIndex]));
@@ -407,6 +386,8 @@ app.component("artifact-box",{
         },
         userSetting: {
             handler(val){
+                if(this.showIndex >= 0 && val.filterPart != "default" && this.ArtifactsList[this.showIndex].part != val.filterPart) this.showIndex = -1;
+                if(this.showIndex >= 0 && val.filterMain != "default" && this.ArtifactsList[this.showIndex].mainEntry != val.filterMain) this.showIndex = -1;
                 this.changeSetting()
             },
             deep: true
@@ -492,15 +473,6 @@ app.component("artifact-box",{
             this.syncListData();
             this.alertControl("已重置全部圣遗物~",1500);
         },
-        // 结果保存到localstorage
-        localRecord(record){
-            if(!window.localStorage){
-                alert("浏览器不支持localstorage");
-                return false;
-            }else{
-                localStorage.localRecord = JSON.stringify(record);
-            }
-        },
         // 保存设置
         changeSetting(){
             if(!window.localStorage){
@@ -515,16 +487,15 @@ app.component("artifact-box",{
             if(confirm("确定要清除模拟器所有数据吗？\n重置后会刷新页面。")){
                 localStorage.clear();
                 this.ArtifactsList.length = 0;
-                ArtifactsSim.result.length = 0;
+                ArtifactsSim.AUSList.length = 0;
                 location.reload();
             }
         },
         // 恢复默认设置
         resetSetting(){
-            let strSetting = JSON.stringify(this.defaultSetting);
             localStorage.removeItem("userSetting");
-            localStorage.userSetting = strSetting;
-            this.userSetting = JSON.parse(strSetting);
+            localStorage.userSetting = this.defaultSetting;
+            this.userSetting = JSON.parse(this.defaultSetting);
             this.alertControl("设置重置成功！",1500);
         },
         // 雷达图设置
@@ -535,8 +506,9 @@ app.component("artifact-box",{
             for(let i = 0; i < opArr.length; i++){
                 opObj[opArr[i][0]] = opArr[i][1];
             }
-            let radarChart = echarts.init(this.$refs.radarChartBox);
-            let radarChart2 = echarts.init(this.$refs.radarChartBox2);
+            let radarChart = echarts.init(this.$refs.radarChartBox),
+                radarChart2 = echarts.init(this.$refs.radarChartBox2),
+                entryValue = artiConst.val.entryValue;
             this.radarChartOption = {
                 textStyle: {
                     fontFamily: "genshin-font"
@@ -544,13 +516,13 @@ app.component("artifact-box",{
                 radar: {
                     splitNumber: 7,
                     indicator: [
-                        { name: '攻击力', max: this.entryValue['ATKPer'][this.entryValue['ATKPer'].length-1]*6, min: -5.8, color: "#262626"},
-                        { name: '暴击', max: this.entryValue['critRate'][this.entryValue['critRate'].length-1]*6, min: -3.9, color: "#262626"},
-                        { name: '暴伤' , max: this.entryValue['critDMG'][this.entryValue['critDMG'].length-1]*6, min: -7.8, color: "#262626"},
-                        { name: '充能效率', max: this.entryValue['energyRecharge'][this.entryValue['energyRecharge'].length-1]*6, min: -6.5, color: "#262626"},
-                        { name: '元素精通', max: this.entryValue['elementMastery'][this.entryValue['elementMastery'].length-1]*6, min: -23, color: "#262626"},
-                        { name: '生命值', max: this.entryValue['HPPer'][this.entryValue['HPPer'].length-1]*6, min: -5.8, color: "#262626"},
-                        { name: '防御力', max: this.entryValue['defPer'][this.entryValue['defPer'].length-1]*6, min: -7.3, color: "#262626"}
+                        { name: '攻击力', max: entryValue['ATKPer'][entryValue['ATKPer'].length-1]*6, min: -5.8, color: "#262626"},
+                        { name: '暴击', max: entryValue['critRate'][entryValue['critRate'].length-1]*6, min: -3.9, color: "#262626"},
+                        { name: '暴伤' , max: entryValue['critDMG'][entryValue['critDMG'].length-1]*6, min: -7.8, color: "#262626"},
+                        { name: '充能效率', max: entryValue['energyRecharge'][entryValue['energyRecharge'].length-1]*6, min: -6.5, color: "#262626"},
+                        { name: '元素精通', max: entryValue['elementMastery'][entryValue['elementMastery'].length-1]*6, min: -23, color: "#262626"},
+                        { name: '生命值', max: entryValue['HPPer'][entryValue['HPPer'].length-1]*6, min: -5.8, color: "#262626"},
+                        { name: '防御力', max: entryValue['defPer'][entryValue['defPer'].length-1]*6, min: -7.3, color: "#262626"}
                     ]
                 },
                 series: [{
@@ -601,8 +573,7 @@ app.component("artifact-box",{
         },
         // 同步数据
         syncListData(){
-            this.ArtifactsList = [...ArtifactsSim.result];
-            this.localRecord(this.ArtifactsList);
+            this.ArtifactsList = [...ArtifactsSim.AUSList];
         }
     }
 })

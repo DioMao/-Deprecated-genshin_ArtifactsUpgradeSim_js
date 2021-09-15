@@ -1,5 +1,5 @@
 /**
- * ArtifactsUpgradeSim v0.1.7
+ * ArtifactsUpgradeSim v0.1.8
  * Copyrigth 2021-2022 DioMao (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/graphs/contributors)
  * Licensed under MIT (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/blob/main/LICENSE)
  */
@@ -81,15 +81,15 @@ class ArtifactConst {
         }
         // 设置只读
         const nope = () => {
-            throw new Error("Error!This data is read only!")
-        }
-        const read_only = (obj) => new Proxy(obj, {
-            set: nope,
-            defineProperty: nope,
-            deleteProperty: nope,
-            preventExtensions: nope,
-            setPrototypeOf: nope
-        });
+                throw new Error("Error!This data is read only!")
+            },
+            read_only = (obj) => new Proxy(obj, {
+                set: nope,
+                defineProperty: nope,
+                deleteProperty: nope,
+                preventExtensions: nope,
+                setPrototypeOf: nope
+            });
         this.__ArtifactConstList__ = read_only(this.__ArtifactConstList__);
     }
 
@@ -103,13 +103,13 @@ class ArtifactConst {
  */
 class ArtifactsFunction_class {
     constructor() {
-        this.__version__ = "0.1.7";
-        this.__result__ = [];
-        this.count = 0;
+        this.__version__ = "0.1.8";
+        this.__AUSList__ = [];
         this.history = [];
-        this.backup = [];
         this.deleteHistory = [];
-        this.__maxResults__ = 2000;
+        this.suitList = [];
+        this.__maxResults__ = 1000;
+        this.localStorageKey = "AUSLocalList";
     }
 
     /**
@@ -121,7 +121,7 @@ class ArtifactsFunction_class {
      * @returns {Object} 对象newArtifacts
      */
     creatArtifact(__part = "", __main = "", __entry = [], __entryRate = []) {
-        if (this.__result__.length >= this.__maxResults__) {
+        if (this.__AUSList__.length >= this.__maxResults__) {
             console.log(`Warning - The maximum length of the artifacts list is ${this.__maxResults__}.`);
             return false;
         }
@@ -190,9 +190,9 @@ class ArtifactsFunction_class {
         // 保存初始状态
         newArtifacts.initEntry = JSON.stringify(newArtifacts.entry);
         // 保存结果
-        this.__result__.push(newArtifacts);
-        this.count++;
+        this.__AUSList__.push(newArtifacts);
         // console.log(newArtifacts);
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
         return newArtifacts;
     }
 
@@ -204,8 +204,8 @@ class ArtifactsFunction_class {
      * @returns 升级结果
      */
     upgrade(__index, __entry = "", __upLevel = -1) {
-        if (__index >= this.__result__.length || __index < 0) return false;
-        let currentArtifact = this.__result__[__index],
+        if (__index >= this.__AUSList__.length || __index < 0) return false;
+        let currentArtifact = this.__AUSList__[__index],
             currentEntry = [],
             currentEntryList = [],
             currentEntryRate = [];
@@ -230,7 +230,6 @@ class ArtifactsFunction_class {
                 addRate = this.randomEntryValue(addEntry);
             currentArtifact.entry.push([addEntry, addRate]);
             currentArtifact.upgradeHistory.push([addEntry, addRate]);
-            // console.log("Upgrade success,new entry is " + addEntry + " + " + addRate);
         } else {
             let upIndex = 0,
                 upEntry = "",
@@ -261,6 +260,7 @@ class ArtifactsFunction_class {
         currentArtifact.level += 4;
         // 增加主属性
         currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][currentArtifact.level / 4];
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
         return true;
     }
 
@@ -272,7 +272,7 @@ class ArtifactsFunction_class {
      */
     ArtifactScore(__index, __rule = "default") {
         if (typeof (__index) != "number" || (typeof (__rule) != "string" && !Array.isArray(__rule))) return 0;
-        if (__index >= this.__result__.length || __index < 0) {
+        if (__index >= this.__AUSList__.length || __index < 0) {
             return 0;
         }
         let atkScore = 0,
@@ -282,7 +282,7 @@ class ArtifactsFunction_class {
             rechargeScore = 0,
             EMScore = 0,
             totalScore = 0,
-            entryArr = this.__result__[__index].entry;
+            entryArr = this.__AUSList__[__index].entry;
         for (let i = 0; i < entryArr.length; i++) {
             let entryNow = entryArr[i][0],
                 addScore = entryArr[i][1] * artiConst.val.scoreStandar[entryNow];
@@ -346,7 +346,6 @@ class ArtifactsFunction_class {
             }
         }
         return totalScore;
-        // return {"atkScore":atkScore,"critScore":critScore,"defScore":defScore,"HPScore":HPScore,"rechargeScore":rechargeScore,"EMScore":EMScore};
     }
 
     /**
@@ -354,21 +353,23 @@ class ArtifactsFunction_class {
      * @param {number} __index 序号
      */
     reset(__index) {
-        let currentArtifact = this.__result__[__index];
+        let currentArtifact = this.__AUSList__[__index];
         currentArtifact.entry.length = 0;
         currentArtifact.entry = JSON.parse(currentArtifact.initEntry);
         currentArtifact.upgradeHistory.length = 0;
         currentArtifact.level = 0;
         currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][0];
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
     }
 
     /**
      * 重置全部圣遗物状态
      */
     resetAll() {
-        for (let i = 0; i < this.__result__.length; i++) {
+        for (let i = 0; i < this.__AUSList__.length; i++) {
             this.reset(i);
         }
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
     }
 
     /**
@@ -376,8 +377,8 @@ class ArtifactsFunction_class {
      * @param {number} __del 要删除的遗物序号
      */
     deleteOne(__del) {
-        this.deleteHistory.push(this.__result__.splice(__del, 1)[0]);
-        this.count--;
+        this.deleteHistory.push(this.__AUSList__.splice(__del, 1)[0]);
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
     }
 
     /**
@@ -387,7 +388,7 @@ class ArtifactsFunction_class {
     batchDelete(__delArr) {
         __delArr.sort((a, b) => a - b);
         for (let i = __delArr.length - 1; i >= 0; i--) {
-            this.deleteHistory.push(this.__result__.splice(__delArr[i], 1)[0]);
+            this.deleteHistory.push(this.__AUSList__.splice(__delArr[i], 1)[0]);
         }
     }
 
@@ -395,11 +396,8 @@ class ArtifactsFunction_class {
      * 清空数据
      */
     clearAll() {
-        // 备份原数据
-        if (this.backup.length != 0) this.backup.length = 0;
-        this.backup = JSON.parse(JSON.stringify(this.__result__));
-        this.__result__.length = 0;
-        this.count = 0;
+        this.__AUSList__.length = 0;
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
     }
 
     /**
@@ -411,8 +409,14 @@ class ArtifactsFunction_class {
             console.log("Undo false, history not found.");
             return false;
         }
-        this.__result__.push(this.deleteHistory.pop());
+        this.__AUSList__.push(this.deleteHistory.pop());
+        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
         return true;
+    }
+
+    /** 圣遗物套装 **/
+    newSuit() {
+        
     }
 
     /** 其他函数 **/
@@ -424,7 +428,7 @@ class ArtifactsFunction_class {
      * @returns 翻译结果
      */
     toChinese(word, type) {
-        if (typeof (word) != "string" || typeof (type) != "string") throw new Error("Function toChinese error!Wrong parameter.");
+        if (typeof (word) != "string" || typeof (type) != "string") return false;
         if (type == "entry") {
             if (artiConst.val.entryList.indexOf(word) != -1) {
                 return artiConst.val.entryListCh[artiConst.val.entryList.indexOf(word)];
@@ -580,8 +584,8 @@ class ArtifactsFunction_class {
     }
 
     get MihoyoImYourDaddy() {
-        for (let i = 0; i < this.result.length; i++) {
-            const artifact = this.result[i];
+        for (let i = 0; i < this.AUSList.length; i++) {
+            const artifact = this.AUSList[i];
             for (let j = 0; j < artifact.entry.length; j++) {
                 const entry = artifact.entry[j];
                 if (entry[0] == "critRate" || entry[0] == "critDMG") {
@@ -594,23 +598,40 @@ class ArtifactsFunction_class {
         return "Yes,you are!";
     }
 
+    /**
+     * localStorage存储
+     * @param {string} key 键
+     * @param {array | srting | object} val 值
+     */
+    setLocalStorage(key,val) {
+        if(typeof(val) == "object") val = JSON.stringify(val);
+        if(typeof(val) == "number") val = val.toString();
+        let storage = window.localStorage;
+        if(!storage){
+            throw new Error("The browser does not support LocalStorage.");
+        } else {
+            storage.setItem(key,val);
+        }
+    }
+
     // 获取版本号
     get version() {
         return this.__version__;
     }
 
-    get result() {
-        return this.__result__;
+    get AUSList() {
+        return this.__AUSList__;
     }
 
-    set result(val) {
+    set AUSList(val) {
         if (Array.isArray(val)) {
             if (val.length > this.__maxResults__) {
                 val.length = this.__maxResults__;
                 console.log(`Warning - The maximum length of the artifacts list is ${this.__maxResults__}.`);
             }
-            this.__result__.length = 0;
-            this.__result__ = val;
+            this.__AUSList__.length = 0;
+            this.__AUSList__ = val;
+            this.setLocalStorage(this.localStorageKey,this.__AUSList__);
             console.log("%cSet new Artifacts list success.", "color:rgb(144,82,41)");
         }
     }
@@ -623,14 +644,14 @@ console.log("%cArtifactsUpgradeSim is running.Learn more: https://github.com/Dio
 /** --------------------------------辅助函数-------------------------------- **/
 
 /**
- * 模拟器版本检查
+ * 模拟器版本检查+读取localStorage
  * @returns 检查结果
  */
 function versionCheck() {
     let storage = window.localStorage;
+    let localList = storage[ArtifactsSim.localStorageKey];
     if (!storage) {
-        alert("浏览器不支持localstorage");
-        return false;
+        throw new Error("The browser does not support LocalStorage.")
     } else {
         if (storage.ArtifactsSimVersion == undefined) {
             storage.ArtifactsSimVersion = ArtifactsSim.version;
@@ -639,6 +660,13 @@ function versionCheck() {
             alert("模拟器版本更新，如果遇到错误，请尝试清除浏览器缓存!");
             storage.ArtifactsSimVersion = ArtifactsSim.version;
             return false;
+        }
+    }
+    if(localList != undefined && localList != "[]" && localList != ""){
+        try {
+            ArtifactsSim.AUSList = JSON.parse(localList);
+        } catch (error) {
+            console.log("%cSet new Artifacts list fail.", "color:rgb(144,82,41)");
         }
     }
     return true;

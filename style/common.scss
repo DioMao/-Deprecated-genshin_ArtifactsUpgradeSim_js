@@ -313,7 +313,7 @@ $genshin_dark: rgb(74, 83, 102);
   align-items: flex-start;
 
   &::-webkit-scrollbar {
-    width: .625rem;
+    width: .4rem;
     height: .0625rem;
     transition: ease 0.2s all;
   }
@@ -329,13 +329,66 @@ $genshin_dark: rgb(74, 83, 102);
     // 滚动条里面轨道
     box-shadow: inset 0 0 0.3125rem rgba(0, 0, 0, 0.2);
     border-radius: .625rem;
-    background: #ededed;
+    background: #fff;
+  }
+
+  .filterBoxFill{
+    width: 100%;
+    height: 3rem;
+  }
+
+  .filterBox {
+    position: fixed;
+    top: 4rem;
+    left: -5rem;
+    z-index: 3;
+    color: rgb(102, 112, 122);
+    background-color: #FFF;
+    padding: 0.5rem 1rem;
+    transition: all 0.5s ease;
+
+    .filterMain,
+    .filterPart {
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+      background-color: $genshin_dark;
+      color: $genshin_white;
+      border-radius: .25rem;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.3rem;
+      margin-left: 0.3rem;
+
+      &::after {
+        content: "×";
+        display: inline-block;
+        text-align: center;
+        height: 0.8rem;
+        width: 0.8rem;
+        line-height: 0.8rem;
+        font-size: 0.8rem;
+        color: rgb(223, 20, 20);
+        background-color: $genshin_white;
+        border-radius: 3rem;
+        margin-left: 0.25rem;
+      }
+    }
+  }
+
+  .filterBoxShow {
+    left: 0;
+  }
+
+  .filterBoxHide {
+    left: -5rem;
   }
 }
 
 // ArtifactsBox
 
 .isSelect {
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .25) !important;
+
   &:after {
     content: "";
     position: absolute;
@@ -344,7 +397,7 @@ $genshin_dark: rgb(74, 83, 102);
     left: 0;
     width: 100%;
     height: 100%;
-    border: .1875rem solid #fc5e5e;
+    border: .1rem solid #ffffff;
     border-radius: .25rem;
   }
 }
@@ -357,6 +410,10 @@ $genshin_dark: rgb(74, 83, 102);
   overflow: hidden;
   border: none !important;
   background-color: $genshin_white !important;
+
+  &:hover {
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .25) !important;
+  }
 
   .ArtifactsTitle {
     position: relative;
@@ -392,6 +449,7 @@ $genshin_dark: rgb(74, 83, 102);
     color: $genshin_dark;
     background-color: $genshin_white;
     font-size: 0.75rem;
+    white-space: nowrap;
   }
 }
 
