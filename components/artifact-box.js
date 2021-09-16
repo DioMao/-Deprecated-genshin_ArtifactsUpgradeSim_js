@@ -9,13 +9,14 @@ app.component("artifact-box",{
             </select>
         </div>
         <div class="container-fluid demo-container" ref="scrollListener">
-            <div class="filterBoxFill" v-show="userSetting.filterMain!='default'||userSetting.filterPart!='default'"></div>
-            <div class="filterBox" :class="(userSetting.filterMain!='default'||userSetting.filterPart!='default')?'filterBoxShow':'filterBoxHide'">
+            <div class="filterBoxFill" v-show="userSetting.filterMain!=='default'||userSetting.filterPart!=='default'"></div>
+            <div class="filterBox" :class="(userSetting.filterMain!=='default'||userSetting.filterPart!=='default')?'filterBoxShow':'filterBoxHide'">
                 <div style="display:inline-block;">筛选:</div>
-                <div class="filterMain" v-show="userSetting.filterMain!='default'" @click="userSetting.filterMain='default'"> {{ (userSetting.filterMain=="ATK" || userSetting.filterMain == "HP")?"固定":"" }}{{ toChinese(userSetting.filterMain,"mainEntry") }}</div>
-                <div class="filterPart" v-show="userSetting.filterPart!='default'" @click="userSetting.filterPart='default'"> {{ toChinese(userSetting.filterPart,"parts") }}</div>
+                <div class="filterMain" v-show="userSetting.filterMain!=='default'" @click="userSetting.filterMain='default'"> {{ (userSetting.filterMain==="ATK" || userSetting.filterMain === "HP")?"固定":"" }}{{ toChinese(userSetting.filterMain,"mainEntry") }}</div>
+                <div class="filterPart" v-show="userSetting.filterPart!=='default'" @click="userSetting.filterPart='default'"> {{ toChinese(userSetting.filterPart,"parts") }}</div>
             </div>
-            <div v-for="(Artifacts,index) in ArtifactsList" :ref="'artifact-'+'index'" :id="'artifact-'+index" class="ArtifactsBox card rounded shawdow-sm" :class="(index==showIndex?'isSelect':'')" v-show="(userSetting.filterPart=='default' || userSetting.filterPart == Artifacts.part) && (userSetting.filterMain == 'default' || userSetting.filterMain == Artifacts.mainEntry)" @click="changeShowIndex(index)">
+            <div class="tips" v-show="ArtifactsList.length===0">列表里还没有圣遗物。<br><span @click="start">创建</span>一个吧！</div>
+            <div v-for="(Artifacts,index) in ArtifactsList" :ref="'artifact-'+'index'" :id="'artifact-'+index" class="ArtifactsBox card rounded shawdow-sm" :class="(index===showIndex?'isSelect':'')" v-show="(userSetting.filterPart==='default' || userSetting.filterPart === Artifacts.part) && (userSetting.filterMain === 'default' || userSetting.filterMain === Artifacts.mainEntry)" @click="changeShowIndex(index)">
                 <div class="card-body ArtifactsTitle" :style="{backgroundImage:'url(./img/A-'+ Artifacts.part + '.png)'}">
                     <div :class="'card-text fs-6 '+(ArtifactRate(index)>=userSetting.highScore?'highscore':'')">{{ toChinese(Artifacts.part,"parts") }}</div>
                     <div class="levelStar">
@@ -37,7 +38,7 @@ app.component("artifact-box",{
                     <li v-for="(entry,index2) in Artifacts.entry" class="list-group-item" @click="ArtifactUpgrade(index,entry[0])">{{ formatEntry(entry[0],entry[1]) }}
                         <span class="badge bg-primary upgradeCheat" v-show="Artifacts.level<20">+</span>
                     </li>
-                    <li class="list-group-item" v-if="Artifacts.entry.length == 3">——</li>
+                    <li class="list-group-item" v-if="Artifacts.entry.length === 3">——</li>
                 </ul>
                 <div class="card-body" style="text-align:center;" v-show="!userSetting.listBriefMode">
                     <button id="upgrade" @click="ArtifactUpgrade(index)" class="btn btn-sm float-start" :disabled="Artifacts.level >= 20">
@@ -45,7 +46,7 @@ app.component("artifact-box",{
                             <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z"/>
                         </svg>
                     </button>
-                    <button id="initArtifact" @click="initArtifact(index)" :class="'btn btn-sm ' + (Artifacts.level==0?'hide':'')" >
+                    <button id="initArtifact" @click="initArtifact(index)" :class="'btn btn-sm ' + (Artifacts.level===0?'hide':'')" >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#037728" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
                             <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
                             <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
@@ -88,14 +89,25 @@ app.component("artifact-box",{
         </div>   
         <footer>
             <div class="gap-2 d-md-flex justify-content-end buttonBox clearfix">
-                <button id="filter" class="btn me-auto btn-genshin" data-bs-toggle="dropdown" aria-expanded="false">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel-fill" viewBox="0 0 16 16">
-                        <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
-                    </svg>
+                <button id="filter" class="btn ms-0 btn-genshin" data-bs-toggle="dropdown" aria-expanded="false">
+                <svg t="1631795704220" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="719" width="20" height="20">
+                    <path d="M128 85.333333 896 85.333333 896 85.333333 896 85.333333 896 170.666667 892.586667 170.666667 597.333333 465.92 597.333333 977.493333 426.666667 806.826667 426.666667 465.493333 131.84 170.666667 128 170.666667 128 85.333333Z" p-id="720"></path>
+                </svg>
                 </button>
                 <ul class="dropdown-menu filterList" aria-labelledby="filter">
-                    <li><a class="dropdown-item" href="#" @click="mainEntryfilter('default')" :style="{background:(userSetting.filterMain=='default'?'rgb(85,92,107)':'inherit')}">默认</a></li>
-                    <li v-for="mainEntryF in artiConst.val.mainEntryList"><a class="dropdown-item" href="#" @click="mainEntryfilter(mainEntryF)" :style="{background:(userSetting.filterMain==mainEntryF?'#596379':'inherit')}">{{ (mainEntryF=="ATK" || mainEntryF == "HP")?"固定":"" }}{{ toChinese(mainEntryF,"mainEntry") }}</a></li>
+                    <li><a class="dropdown-item" href="#" @click="mainEntryfilter('default')" :style="{background:(userSetting.filterMain==='default'?'rgb(85,92,107)':'inherit')}">默认<span class="ms-5 float-end">{{ ArtifactsList.length }}</span></a></li>
+                    <li v-for="mainEntryF in artiConst.val.mainEntryList"><a class="dropdown-item" href="#" @click="mainEntryfilter(mainEntryF)" :style="{background:(userSetting.filterMain===mainEntryF?'#596379':'inherit'),color:(getCount(mainEntryF)>0?'':'#a8a8a8')}">{{ (mainEntryF==="ATK" || mainEntryF === "HP")?"固定":"" }}{{ toChinese(mainEntryF,"mainEntry") }} <span class="ms-5 float-end">{{ getCount(mainEntryF) }}</span></a></li>
+                </ul>
+                <button id="sort" class="btn me-auto btn-genshin" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg class="bi bi-funnel-fill" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor">
+                        <path d="M680 64c6.848 0 13.44 1.28 19.584 3.52 22.528 3.968 41.152 23.68 41.152 49.792v517.376h167.296c13.056 0 26.112 5.312 36.608 16 20.928 21.312 20.928 53.312-2.624 74.624l-214.4 218.688a51.2 51.2 0 0 1-41.92 15.68l-5.696 0.32a56 56 0 0 1-56-56V120c0-30.912 25.088-56 56-56z m-336 0c30.912 0 56 25.088 56 56v784a56 56 0 0 1-73.856 53.12 50.176 50.176 0 0 1-45.184-50.432V386.688H116.288a51.136 51.136 0 0 1-36.608-16C58.752 352 58.752 320 79.68 298.688l211.776-216c5.248-5.376 10.432-10.688 18.304-16h2.56c5.248 0 10.496-2.688 15.744-2.688 2.56 0 5.12 0.192 7.68 0.64A54.208 54.208 0 0 1 344 64z" p-id="774"></path>
+                    </svg>
+                </button>
+                <ul class="dropdown-menu sortList" aria-labelledby="sort">
+                    <li><a class="dropdown-item" href="#" @click="sortList(0)">等级升序</a></li>
+                    <li><a class="dropdown-item" href="#" @click="sortList(1)">等级降序</a></li>
+                    <li><a class="dropdown-item" href="#" @click="sortList(2)">按位置排序</a></li>
+                    <li><a class="dropdown-item" href="#" @click="sortList(3)">按主属性排序</a></li>
                 </ul>
                 <button id="start" @click="start" class="btn btn-genshin"><span class="circleinbox"></span>随机</button>
                 <button class="btn btn-genshin" data-bs-toggle="modal" data-bs-target="#cusArtifact"><span class="squareinbox"></span>自选</button>
@@ -164,18 +176,18 @@ app.component("artifact-box",{
                         <select id="cutArtifactPart" class="form-select form-select-sm mb-3" v-model="cusPart" @change="cusEntry.length=0;cusMainEntry=''">
                             <option v-for="part in artiConst.val.parts" :value="part">{{ toChinese(part,"parts") }}</option>
                         </select>
-                        <label class="form-label" v-show="cusPart!='default'&&cusPart!=''">主属性</label>
-                        <select class="form-select form-select-sm mb-3" v-if="cusPart!='default'&&cusPart!=''" v-model="cusMainEntry" @change="cusEntry.length=0">
+                        <label class="form-label" v-show="cusPart!=='default'&&cusPart!==''">主属性</label>
+                        <select class="form-select form-select-sm mb-3" v-if="cusPart!=='default'&&cusPart!==''" v-model="cusMainEntry" @change="cusEntry.length=0">
                             <option v-for="partModal in cusEntryList[cusPart]" :value="partModal">{{ toChinese(partModal,"mainEntry") }}</option>
                         </select>
-                        <label class="form-label" v-show="cusPart!='default'&&cusMainEntry!=''">副词条选择</label>
+                        <label class="form-label" v-show="cusPart!=='default'&&cusMainEntry!==''">副词条选择</label>
                         <div class="d-flex justify-content-between flex-wrap">
-                            <div class="form-check mb-2" style="width:40%;" v-for="entry in artiConst.val.entryList" v-show="cusPart!='default'&&cusMainEntry!=''&&cusMainEntry!=entry">
-                                <input class="form-check-input" v-model="cusEntry" type="checkbox" :value="entry" :id="entry+'Check'" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
+                            <div class="form-check mb-2" style="width:40%;" v-for="entry in artiConst.val.entryList" v-show="cusPart!=='default'&&cusMainEntry!==''&&cusMainEntry!==entry">
+                                <input class="form-check-input" v-model="cusEntry" type="checkbox" :value="entry" :id="entry+'Check'" :disabled="cusEntry.length===4&&cusEntry.indexOf(entry)===-1">
                                 <label class="form-check-label" :for="entry+'Check'">
                                 {{ toChinese(entry,"entry") }}
                                 </label>
-                                <select class="form-select form-select-sm mt-1 mb-1 col-md-6 ms-auto" v-model="cusEntryRate[entry]" :disabled="cusEntry.length==4&&cusEntry.indexOf(entry)==-1">
+                                <select class="form-select form-select-sm mt-1 mb-1 col-md-6 ms-auto" v-model="cusEntryRate[entry]" :disabled="cusEntry.length===4&&cusEntry.indexOf(entry)===-1">
                                     <option v-for="entryValueModal in artiConst.val.entryValue[entry]" :value="entryValueModal">{{ entryValFormat(entry,entryValueModal) }}</option>
                                 </select>
                             </div>
@@ -243,13 +255,13 @@ app.component("artifact-box",{
                                 自选模式
                             </label>
                         </div>
-                        <div v-show="userSetting.scoreConfig.mode=='string'">
+                        <div v-show="userSetting.scoreConfig.mode==='string'">
                             <select class="form-select form-select-sm" name="scoreString" id="scoreString" v-model="userSetting.scoreConfig.strRule">
                                 <option value="default">默认</option>
                                 <option v-for="config in artiConst.val.scoreList" :value="config">{{ toChinese(config,"score") }}</option>
                             </select>
                         </div>
-                        <div class="justify-content-between flex-wrap" style="display:flex;" v-show="userSetting.scoreConfig.mode=='array'">
+                        <div class="justify-content-between flex-wrap" style="display:flex;" v-show="userSetting.scoreConfig.mode==='array'">
                             <div class="form-check" style="width:40%;" v-for="config in artiConst.val.scoreList">
                                 <input class="form-check-input" type="checkbox" :value="config" :id="'score-'+config" v-model="userSetting.scoreConfig.arrRule">
                                 <label class="form-check-label" :for="'score-'+config">
@@ -271,7 +283,7 @@ app.component("artifact-box",{
                     <div class="modal-body">
                         <div>Version: {{version}} </div>
                         <div>Author: <a href="https://github.com/DioMao" target="_blank">DioMao</a></div>
-                        <div>Frameworks: <br>Vue-v3.2.4 <br>vue-router-v4.0.11 <br>Bootstrap-v5.1.0 <br>Echarts-v5.1.2</div>
+                        <div>Frameworks: <br>Vue-v3.2.4 <br>Vue-router-v4.0.11 <br>Bootstrap-v5.1.0 <br>Echarts-v5.1.2</div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-genshin-dark" data-bs-dismiss="modal"><span class="circleinbox"></span>确认</button>
@@ -285,6 +297,7 @@ app.component("artifact-box",{
         return {
             artiConst: Object,              // 圣遗物常量表
             showIndex: -1,                  // 右侧圣遗物展示序号
+            showSymbol: "",                 // 展示圣遗物的symbol
             showDetail: Object,             // 右侧圣遗物展示详情
             ArtifactsList: [],              // 圣遗物列表
             cusCloseSwitch: true,           // 自选圣遗物-生成后是否关闭modal窗
@@ -313,7 +326,7 @@ app.component("artifact-box",{
                 alertState: "success"       // 提示框类型
             },
             radarChartOption: Object,       // 雷达图配置
-            version: String                 // 版本信息
+            version: String,                // 版本信息
         }
     },
     created(){
@@ -335,16 +348,16 @@ app.component("artifact-box",{
     mounted(){
         var that = this;
         // 初始化时列表数据保持一致
-        if(this.ArtifactsList.length == 0 && ArtifactsSim.AUSList.length != 0){
+        if(this.ArtifactsList.length === 0 && ArtifactsSim.AUSList.length !== 0){
             this.ArtifactsList = [...ArtifactsSim.AUSList];
         }
         if(!window.localStorage){
             alert("浏览器不支持localstorage");
             return false;
         }else{
-            if(localStorage.userSetting == undefined){
+            if(localStorage.userSetting === undefined){
                 localStorage.userSetting = this.defaultSetting;
-            }else if(localStorage.userSetting != ''){
+            }else if(localStorage.userSetting !== ''){
                 let settingObj = JSON.parse(localStorage.getItem("userSetting"));
                 Object.assign(this.userSetting,settingObj);
             };
@@ -366,9 +379,9 @@ app.component("artifact-box",{
             let mode = this.userSetting.scoreConfig.mode,
             index = this.showIndex,
             artifact = this.ArtifactsList[index];       // 监听当前圣遗物数据，更新评分视图用
-            if(mode == "string"){
+            if(mode === "string"){
                 return ArtifactsSim.ArtifactScore(index,this.userSetting.scoreConfig.strRule).toFixed(2);
-            }else if(mode == "array"){
+            }else if(mode === "array"){
                 return ArtifactsSim.ArtifactScore(index,this.userSetting.scoreConfig.arrRule).toFixed(2);
             }else{
                 return 0;
@@ -386,8 +399,8 @@ app.component("artifact-box",{
         },
         userSetting: {
             handler(val){
-                if(this.showIndex >= 0 && val.filterPart != "default" && this.ArtifactsList[this.showIndex].part != val.filterPart) this.showIndex = -1;
-                if(this.showIndex >= 0 && val.filterMain != "default" && this.ArtifactsList[this.showIndex].mainEntry != val.filterMain) this.showIndex = -1;
+                if(this.showIndex >= 0 && val.filterPart !== "default" && this.ArtifactsList[this.showIndex].part !== val.filterPart) this.showIndex = -1;
+                if(this.showIndex >= 0 && val.filterMain !== "default" && this.ArtifactsList[this.showIndex].mainEntry !== val.filterMain) this.showIndex = -1;
                 this.changeSetting()
             },
             deep: true
@@ -415,9 +428,9 @@ app.component("artifact-box",{
         ArtifactUpgrade(index,entry=""){
             let res = ArtifactsSim.upgrade(index,entry,this.userSetting.entryQuality),
                 qualityAlert = "";
-            if(this.userSetting.entryQuality != -1) qualityAlert = "已启用副词条自选提升幅度！"
+            if(this.userSetting.entryQuality !== -1) qualityAlert = "已启用副词条自选提升幅度！"
             this.syncListData();
-            if(res == true){
+            if(res === true){
                 this.alertControl(`升级成功！${qualityAlert}`,1500);
             }else{
                 this.alertControl("当前圣遗物已满级~",1500,"warning");
@@ -426,9 +439,9 @@ app.component("artifact-box",{
         // 圣遗物评分
         ArtifactRate(index){
             let mode = this.userSetting.scoreConfig.mode;
-            if(mode == "string"){
+            if(mode === "string"){
                 return ArtifactsSim.ArtifactScore(index,this.userSetting.scoreConfig.strRule);
-            }else if(mode == "array"){
+            }else if(mode === "array"){
                 return ArtifactsSim.ArtifactScore(index,this.userSetting.scoreConfig.arrRule);
             }else{
                 return 0;
@@ -442,7 +455,7 @@ app.component("artifact-box",{
         },
         // 清除结果列表
         ArtifactClear(){
-            if(this.ArtifactsList.length == 0){
+            if(this.ArtifactsList.length === 0){
                 this.alertControl("当前列表已经空了哦！",1500,"warning");
             }else if(confirm("确认要清空圣遗物吗？\n请注意，此操作不可恢复！")){
                 this.showIndex = -1;
@@ -461,7 +474,7 @@ app.component("artifact-box",{
         undoDel(){
             let res = ArtifactsSim.undoDel();
             this.syncListData();
-            if(res == true){
+            if(res === true){
                 this.alertControl("撤销删除成功！",1500);
             }else{
                 this.alertControl("没有可以撤销的数据！",1500,"primary");
@@ -550,12 +563,18 @@ app.component("artifact-box",{
         },
         // 词条属性处理
         entryValFormat(entry,val,type="default"){
-            if(type != "main") return ArtifactsSim.entryValFormat(entry,val);
+            if(type !== "main") return ArtifactsSim.entryValFormat(entry,val);
             return ArtifactsSim.entryValFormat(entry,val,"main");
         },
-        // 
+        // 主属性筛选
         mainEntryfilter(val){
             this.userSetting.filterMain = val;
+        },
+        // 排序
+        sortList(index){
+            let sortMethod = ["lvasc","lvdesc","part","main"];
+            ArtifactsSim.sortList(sortMethod[index]);
+            this.syncListData();
         },
         // 转换为中文
         toChinese(word,type){
@@ -574,6 +593,10 @@ app.component("artifact-box",{
         // 同步数据
         syncListData(){
             this.ArtifactsList = [...ArtifactsSim.AUSList];
+        },
+        // 获取数量
+        getCount(key){
+            return ArtifactsSim.getCount(key);
         }
     }
 })

@@ -1,5 +1,6 @@
 $genshin_white: rgb(236, 229, 216);
 $genshin_dark: rgb(74, 83, 102);
+$genshin_gray: rgb(149,149,149);
 
 @font-face {
   font-family: "genshin-font";
@@ -260,18 +261,19 @@ $genshin_dark: rgb(74, 83, 102);
 
 .navbar {
   height: 3.3125rem;
-  background-color: #d2cab0;
+  background-color: $genshin_dark;
   width: 100%;
   z-index: 10;
 
   .siteTitle {
     font-size: 1.2rem;
-    color: $genshin_dark;
+    color: $genshin_white;
+    padding-left: .3rem;
 
     a {
-      color: #262626;
+      color: $genshin_white;
       text-decoration-line: none;
-      box-shadow: #70575c -0.6875rem .0625rem 0rem 0rem;
+      box-shadow: #c38542 -0.6875rem .0625rem 0rem 0rem;
     }
   }
 }
@@ -311,6 +313,22 @@ $genshin_dark: rgb(74, 83, 102);
   position: relative;
   align-content: flex-start;
   align-items: flex-start;
+
+  .tips{
+    position: absolute;
+    top: 45%;
+    left: 0;
+    width: 100%;
+    color: $genshin_gray;
+    font-size: 1.5rem;
+    text-align: center;
+    opacity: 0.5;
+
+    span{
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
 
   &::-webkit-scrollbar {
     width: .4rem;
@@ -365,7 +383,7 @@ $genshin_dark: rgb(74, 83, 102);
         text-align: center;
         height: 0.8rem;
         width: 0.8rem;
-        line-height: 0.8rem;
+        line-height: 0.9rem;
         font-size: 0.8rem;
         color: rgb(223, 20, 20);
         background-color: $genshin_white;
@@ -489,7 +507,7 @@ footer {
   justify-content: flex-end;
 }
 
-#filter {
+#filter,#sort {
   height: 2.3125rem;
   width: 2.3125rem;
   background-color: $genshin_white;
@@ -501,6 +519,11 @@ footer {
   height: 26.875rem;
   overflow-y: scroll;
   background-color: rgb(61, 69, 86) !important;
+  background-image: url(../img/genshin-symbol.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position-y: 50%;
+  background-blend-mode: multiply;
 
   &::-webkit-scrollbar {
     display: none;
@@ -508,11 +531,24 @@ footer {
 
   li a {
     &:hover {
-      color: rgb(234, 227, 214);
-      background-color: $genshin_dark !important;
+      color: $genshin_white;
+      background-color: rgba(72, 81, 98, 0.5) !important;
     }
 
-    color: rgb(234, 227, 214);
+    color: $genshin_white;
+  }
+}
+
+.sortList {
+  background-color: rgb(61, 69, 86) !important;
+
+  li a {
+    &:hover {
+      color: $genshin_white;
+      background-color: rgba(72, 81, 98, 0.5) !important;
+    }
+
+    color: $genshin_white;
   }
 }
 
@@ -543,7 +579,6 @@ footer {
 
 #score,
 #score-2 {
-  background-color: #fed323;
   float: right;
   margin-top: -0.25rem;
 }
@@ -1091,7 +1126,7 @@ footer {
 }
 
 .ani-fogMove {
-  animation: fogMove 30s linear infinite;
+  animation: fogMove 90s linear infinite;
 }
 
 @keyframes showAlertBody {

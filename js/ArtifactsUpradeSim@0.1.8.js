@@ -1,5 +1,5 @@
 /**
- * ArtifactsUpgradeSim v0.1.8
+ * ArtifactsUpgradeSim v0.1.9
  * Copyrigth 2021-2022 DioMao (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/graphs/contributors)
  * Licensed under MIT (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/blob/main/LICENSE)
  */
@@ -103,13 +103,13 @@ class ArtifactConst {
  */
 class ArtifactsFunction_class {
     constructor() {
-        this.__version__ = "0.1.8";
+        this.__version__ = "0.1.9";
         this.__AUSList__ = [];
-        this.history = [];
-        this.deleteHistory = [];
-        this.suitList = [];
+        this.__deleteHistory__ = [];
+        this.__suitList__ = [];
         this.__maxResults__ = 1000;
-        this.localStorageKey = "AUSLocalList";
+        this.__localStorageKey__ = "AUSLocalList";
+        this.__countList__ = {};
     }
 
     /**
@@ -126,6 +126,7 @@ class ArtifactsFunction_class {
             return false;
         }
         let newArtifacts = {
+                symbol: "",
                 level: 0,
                 part: "none",
                 mainEntry: "none",
@@ -133,18 +134,19 @@ class ArtifactsFunction_class {
                 entry: [],
                 initEntry: '',
                 upgradeHistory: [],
-                creationDate: Date.now()
+                creationDate: Date.now(),
+                lock: false
             },
             ArtifactEntry = [],
             ArtifactEntryRate = [];
         // 自选或随机位置
-        if (typeof (__part) == "string" && artiConst.val.parts.indexOf(__part) != -1) {
+        if (typeof (__part) === "string" && artiConst.val.parts.indexOf(__part) !== -1) {
             newArtifacts.part = __part;
         } else {
             newArtifacts.part = artiConst.val.parts[Math.floor((Math.random() * artiConst.val.parts.length))];
         }
         // 自选或随机主属性
-        if (typeof (__main) == "string" && artiConst.val.mainEntryList.indexOf(__main) != -1 && this.mainEntryVerify(newArtifacts.part, __main)) {
+        if (typeof (__main) === "string" && artiConst.val.mainEntryList.indexOf(__main) !== -1 && this.mainEntryVerify(newArtifacts.part, __main)) {
             newArtifacts.mainEntry = __main;
         } else {
             newArtifacts.mainEntry = this.randomMainEntry(newArtifacts.part);
@@ -153,7 +155,7 @@ class ArtifactsFunction_class {
         newArtifacts.mainEntryValue = artiConst.val.mainEntryValueList[newArtifacts.mainEntry][0];
         // 临时词条库（排除已有词条）
         for (let i = 0; i < artiConst.val.entryList.length; i++) {
-            artiConst.val.entryList[i] == newArtifacts.mainEntry ? null : (ArtifactEntry.push(artiConst.val.entryList[i]), ArtifactEntryRate.push(artiConst.val.entryProbability[i]));
+            artiConst.val.entryList[i] === newArtifacts.mainEntry ? null : (ArtifactEntry.push(artiConst.val.entryList[i]), ArtifactEntryRate.push(artiConst.val.entryProbability[i]));
         }
         // 自选副词条
         if (__entry.length <= 4 && this.entryVerify(newArtifacts.mainEntry, __entry)) {
@@ -165,7 +167,7 @@ class ArtifactsFunction_class {
                 ArtifactEntry.splice(index, 1);
                 ArtifactEntryRate.splice(index, 1);
                 // 判断自选副词条数值是否合规
-                if (__entryRate.length == 0 || typeof (cusEntryRate) != "number" || artiConst.val.entryValue[cusEntry].indexOf(cusEntryRate) == -1) {
+                if (__entryRate.length === 0 || typeof (cusEntryRate) !== "number" || artiConst.val.entryValue[cusEntry].indexOf(cusEntryRate) === -1) {
                     cusEntryRate = this.randomEntryValue(__entry);
                 }
                 newArtifacts.entry.push([cusEntry, cusEntryRate]);
@@ -183,16 +185,18 @@ class ArtifactsFunction_class {
             newArtifacts.entry.push([newEntry, newEntryRate]);
         }
         // 是否拥有初始四词条
-        if (__entry.length == 0 && Math.random() < artiConst.val.extraEnrtyRate) {
+        if (__entry.length === 0 && Math.random() < artiConst.val.extraEnrtyRate) {
             let newEntry = this.randomRate(ArtifactEntry, ArtifactEntryRate);
             newArtifacts.entry[3] = [newEntry, this.randomEntryValue(newEntry)];
         }
+        newArtifacts.symbol = Date.now().toString(36) + "-" + Math.random().toString(36).substring(2);
         // 保存初始状态
         newArtifacts.initEntry = JSON.stringify(newArtifacts.entry);
         // 保存结果
         this.__AUSList__.push(newArtifacts);
         // console.log(newArtifacts);
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
+        this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
+        this.changeCount([newArtifacts.part, newArtifacts.mainEntry]);
         return newArtifacts;
     }
 
@@ -235,9 +239,9 @@ class ArtifactsFunction_class {
                 upEntry = "",
                 upRate = 0;
             // 优先升级自选词条
-            if (__entry != "" && artiConst.val.entryList.indexOf(__entry) >= 0) {
+            if (__entry !== "" && artiConst.val.entryList.indexOf(__entry) >= 0) {
                 for (let i = 0; i < currentArtifact.entry.length; i++) {
-                    if (__entry == currentArtifact.entry[i][0]) {
+                    if (__entry === currentArtifact.entry[i][0]) {
                         upIndex = i;
                         upEntry = currentArtifact.entry[i][0];
                     }
@@ -247,7 +251,7 @@ class ArtifactsFunction_class {
                 upIndex = Math.floor(Math.random() * currentArtifact.entry.length);
                 upEntry = currentArtifact.entry[upIndex][0];
             }
-            if (__upLevel != -1 && typeof (__upLevel) == "number" && Math.floor(__upLevel) < artiConst.val.entryValue[upEntry].length) {
+            if (__upLevel !== -1 && typeof (__upLevel) === "number" && Math.floor(__upLevel) < artiConst.val.entryValue[upEntry].length) {
                 upRate = artiConst.val.entryValue[upEntry][Math.floor(__upLevel)];
             } else {
                 upRate = this.randomEntryValue(upEntry);
@@ -260,7 +264,7 @@ class ArtifactsFunction_class {
         currentArtifact.level += 4;
         // 增加主属性
         currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][currentArtifact.level / 4];
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
+        this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
         return true;
     }
 
@@ -271,7 +275,7 @@ class ArtifactsFunction_class {
      * @returns 得分
      */
     ArtifactScore(__index, __rule = "default") {
-        if (typeof (__index) != "number" || (typeof (__rule) != "string" && !Array.isArray(__rule))) return 0;
+        if (typeof (__index) !== "number" || (typeof (__rule) !== "string" && !Array.isArray(__rule))) return 0;
         if (__index >= this.__AUSList__.length || __index < 0) {
             return 0;
         }
@@ -286,17 +290,17 @@ class ArtifactsFunction_class {
         for (let i = 0; i < entryArr.length; i++) {
             let entryNow = entryArr[i][0],
                 addScore = entryArr[i][1] * artiConst.val.scoreStandar[entryNow];
-            if (entryNow == "ATK" || entryNow == "ATKPer") {
+            if (entryNow === "ATK" || entryNow === "ATKPer") {
                 atkScore += addScore;
-            } else if (entryNow == "critRate" || entryNow == "critDMG") {
+            } else if (entryNow === "critRate" || entryNow === "critDMG") {
                 critScore += addScore;
-            } else if (entryNow == "def" || entryNow == "defPer") {
+            } else if (entryNow === "def" || entryNow === "defPer") {
                 defScore += addScore;
-            } else if (entryNow == "HP" || entryNow == "HPPer") {
+            } else if (entryNow === "HP" || entryNow === "HPPer") {
                 HPScore += addScore;
-            } else if (entryNow == "energyRecharge") {
+            } else if (entryNow === "energyRecharge") {
                 rechargeScore += addScore;
-            } else if (entryNow == "elementMastery") {
+            } else if (entryNow === "elementMastery") {
                 EMScore += addScore;
             }
         }
@@ -351,15 +355,21 @@ class ArtifactsFunction_class {
     /**
      * 圣遗物重置初始状态
      * @param {number} __index 序号
+     * @returns 返回操作结果
      */
     reset(__index) {
         let currentArtifact = this.__AUSList__[__index];
-        currentArtifact.entry.length = 0;
-        currentArtifact.entry = JSON.parse(currentArtifact.initEntry);
-        currentArtifact.upgradeHistory.length = 0;
-        currentArtifact.level = 0;
-        currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][0];
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
+        if (currentArtifact.lock) {
+            return false;
+        } else {
+            currentArtifact.entry.length = 0;
+            currentArtifact.entry = JSON.parse(currentArtifact.initEntry);
+            currentArtifact.upgradeHistory.length = 0;
+            currentArtifact.level = 0;
+            currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][0];
+            this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
+            return true;
+        }
     }
 
     /**
@@ -369,26 +379,24 @@ class ArtifactsFunction_class {
         for (let i = 0; i < this.__AUSList__.length; i++) {
             this.reset(i);
         }
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
+        this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
     }
 
     /**
      * 删除指定数据
-     * @param {number} __del 要删除的遗物序号
+     * @param {number} index 要删除的遗物序号
+     * @returns 操作结果
      */
-    deleteOne(__del) {
-        this.deleteHistory.push(this.__AUSList__.splice(__del, 1)[0]);
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-    }
-
-    /**
-     * 批量删除指定数据
-     * @param {array} __delArr 要删除的遗物序号（数组）
-     */
-    batchDelete(__delArr) {
-        __delArr.sort((a, b) => a - b);
-        for (let i = __delArr.length - 1; i >= 0; i--) {
-            this.deleteHistory.push(this.__AUSList__.splice(__delArr[i], 1)[0]);
+    deleteOne(index) {
+        let artifact = this.__AUSList__[index];
+        if (artifact.lock === true) {
+            console.log("%cDelete fail.This Artifact is locked.", "color:rgb(144,82,41)");
+            return false;
+        } else {
+            this.changeCount([artifact.part, artifact.mainEntry], -1);
+            this.__deleteHistory__.push(this.__AUSList__.splice(index, 1)[0]);
+            this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
+            return true;
         }
     }
 
@@ -396,8 +404,9 @@ class ArtifactsFunction_class {
      * 清空数据
      */
     clearAll() {
+        this.__countList__ = {};
         this.__AUSList__.length = 0;
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
+        this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
     }
 
     /**
@@ -405,18 +414,168 @@ class ArtifactsFunction_class {
      * @returns 结果
      */
     undoDel() {
-        if (this.deleteHistory.length == 0) {
+        if (this.__deleteHistory__.length === 0) {
             console.log("Undo false, history not found.");
             return false;
         }
-        this.__AUSList__.push(this.deleteHistory.pop());
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
+        let artifact = this.__deleteHistory__.pop();
+        this.__AUSList__.push(artifact);
+        this.changeCount([artifact.part, artifact.mainEntry]);
+        this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
         return true;
+    }
+
+    /**
+     * 更改countList
+     * @param {string | array} key 键
+     * @param {number} range 增加的值（为负数时则减少）
+     * @returns 操作结果 true/false
+     */
+    changeCount(key, range = 1) {
+        if (typeof (key) !== "string" && !Array.isArray(key)) return false;
+        let countList = this.__countList__;
+        if (typeof (key) === "string") {
+            key = [key];
+        }
+        key.forEach(val => {
+            if (countList.hasOwnProperty(val)) {
+                countList[val] = countList[val] + range;
+            } else {
+                countList[val] = range;
+            }
+            if (countList[val] < 0) countList[val] = 0;
+        })
+        return true;
+    }
+
+    /**
+     * 强制刷新countList
+     */
+    enforceUpdateCount() {
+        this.__countList__ = {}
+        this.__AUSList__.forEach(val => {
+            this.changeCount([val.part, val.mainEntry]);
+        })
+    }
+
+    /**
+     * 圣遗物上锁/解锁
+     * @param {number} index 圣遗物下标
+     * @param {string} method 操作（上锁lock/解锁unlock）
+     * @returns 操作结果
+     */
+    lock(index, method = "lock") {
+        if (typeof (index) !== 'number' && method !== "lock" && method !== "unlock") return;
+        if (method === "lock") {
+            this.__AUSList__.lock = true;
+        } else {
+            this.__AUSList__.lock = false;
+        }
+        return true;
+    }
+
+    /**
+     * 查找countList
+     * @param {string} key 键
+     * @returns 键值
+     */
+    getCount(key) {
+        if (typeof (key) !== "string") return false;
+        let countList = this.__countList__;
+        if (countList.hasOwnProperty(key)) {
+            return countList[key];
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * 对圣遗物列表排序
+     * @param {string} rule 排序规则
+     * @returns 排序结果（失败才有返回值）
+     */
+    sortList(rule = "lvasc") {
+        if (typeof (rule) !== "string") return false;
+        if (rule === "main") rule = "mainEntry";
+        let list = this.__AUSList__;
+        try {
+            list.sort((val_a, val_b) => {
+                if (rule === "lvasc" || rule === "lvdesc") {
+                    // 排序优先级：先按照等级升序，再按照位置升序，最后按主属性升序
+                    if (val_a.level > val_b.level) {
+                        return 1;
+                    } else if (val_a.level < val_b.level) {
+                        return -1
+                    } else if (val_a.level === val_b.level) {
+                        let part_a = val_a.part.toUpperCase(),
+                            part_b = val_b.part.toUpperCase();
+                        if (part_a > part_b) {
+                            return 1;
+                        } else if (part_a < part_b) {
+                            return -1;
+                        } else if (part_a === part_b) {
+                            let main_a = val_a.mainEntry.toUpperCase(),
+                                main_b = val_b.mainEntry.toUpperCase();
+                            if (main_a > main_b) {
+                                return 1;
+                            } else if (main_a < main_b) {
+                                return -1
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                };
+                if (rule === "part" || rule === "mainEntry") {
+                    // 排序优先级：先按照part/mainEntry升序，再按照等级降序排列
+                    let name_a = val_a[rule].toUpperCase(),
+                        name_b = val_b[rule].toUpperCase();
+                    if (name_a > name_b) {
+                        return 1;
+                    }
+                    if (name_a < name_b) {
+                        return -1;
+                    }
+                    if (name_a === name_b) {
+                        if (val_a.level > val_b.level) {
+                            return -1
+                        } else if (val_a.level < val_b.level) {
+                            return 1
+                        } else {
+                            return 0;
+                        }
+                    }
+                    return 0;
+                }
+            })
+            if (rule === "lvdesc") {
+                list.reverse();
+            };
+            this.setLocalStorage(this.__localStorageKey__, list);
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    /**
+     * 根据symbol查询圣遗物所在位置（下标）
+     * @param {string} symbol 圣遗物标识
+     * @returns 圣遗物在表中的位置(index)
+     */
+    searchSymbol(symbol) {
+        for (let i = 0; i < this.__AUSList__.length; i++) {
+            const item = this.__AUSList__[i];
+            if (item.symbol === symbol) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** 圣遗物套装 **/
     newSuit() {
-        
+        // 暂时搁置
     }
 
     /** 其他函数 **/
@@ -428,24 +587,24 @@ class ArtifactsFunction_class {
      * @returns 翻译结果
      */
     toChinese(word, type) {
-        if (typeof (word) != "string" || typeof (type) != "string") return false;
+        if (typeof (word) !== "string" || typeof (type) !== "string") return false;
         if (type == "entry") {
-            if (artiConst.val.entryList.indexOf(word) != -1) {
+            if (artiConst.val.entryList.indexOf(word) !== -1) {
                 return artiConst.val.entryListCh[artiConst.val.entryList.indexOf(word)];
             }
             return false;
-        } else if (type == "parts") {
-            if (artiConst.val.parts.indexOf(word) != -1) {
+        } else if (type === "parts") {
+            if (artiConst.val.parts.indexOf(word) !== -1) {
                 return artiConst.val.partsCh[artiConst.val.parts.indexOf(word)];
             }
             return false;
-        } else if (type == "mainEntry") {
-            if (artiConst.val.mainEntryList.indexOf(word) != -1) {
+        } else if (type === "mainEntry") {
+            if (artiConst.val.mainEntryList.indexOf(word) !== -1) {
                 return artiConst.val.mainEntryListCh[artiConst.val.mainEntryList.indexOf(word)];
             }
             return false;
-        } else if (type == "score") {
-            if (artiConst.val.scoreList.indexOf(word) != -1) {
+        } else if (type === "score") {
+            if (artiConst.val.scoreList.indexOf(word) !== -1) {
                 return artiConst.val.scoreListCh[artiConst.val.scoreList.indexOf(word)];
             }
             return false;
@@ -463,20 +622,20 @@ class ArtifactsFunction_class {
     entryValFormat(entry, entryValue, type = "default") {
         const percentEntry = ["critRate", "critDMG", "ATKPer", "defPer", "HPPer", "energyRecharge"],
             nonPercentMain = ["ATK", "HP", "elementMastery"];
-        if (typeof (entry) != "string" || typeof (type) != "string" || (typeof (entryValue) != "string" && typeof (entryValue) != "number")) {
+        if (typeof (entry) !== "string" || typeof (type) !== "string" || (typeof (entryValue) !== "string" && typeof (entryValue) !== "number")) {
             return false;
         }
-        if (type.toLowerCase() == "main") {
-            if (artiConst.val.mainEntryList.indexOf(entry) == -1) return false;
-            if (nonPercentMain.indexOf(entry) != -1) {
+        if (type.toLowerCase() === "main") {
+            if (artiConst.val.mainEntryList.indexOf(entry) === -1) return false;
+            if (nonPercentMain.indexOf(entry) !== -1) {
                 entryValue = this.toThousands(entryValue);
             } else {
                 entryValue = Number.parseFloat(entryValue).toFixed(1) + "%";
             }
             return entryValue;
         } else {
-            if (artiConst.val.entryList.indexOf(entry) == -1) return false;
-            if (percentEntry.indexOf(entry) != -1) {
+            if (artiConst.val.entryList.indexOf(entry) === -1) return false;
+            if (percentEntry.indexOf(entry) !== -1) {
                 entryValue = Number.parseFloat(entryValue).toFixed(1) + "%";
             } else {
                 entryValue = this.toThousands(Number.parseFloat(entryValue).toFixed(0));
@@ -492,7 +651,7 @@ class ArtifactsFunction_class {
      */
     randomRate(__arr1, __arr2) {
         if (!Array.isArray(__arr1) || !Array.isArray(__arr2)) throw new Error("Function RandomRate Warning!Wrong parameter.");
-        if (__arr1.length != __arr2.length) throw new Error("Function RandomRate Warning!Array length different!");
+        if (__arr1.length !== __arr2.length) throw new Error("Function RandomRate Warning!Array length different!");
         let __rand = Math.random(),
             __rate = 0,
             __totalRate = 0;
@@ -514,7 +673,7 @@ class ArtifactsFunction_class {
      * @param {string} __part 位置
      */
     randomMainEntry(__part) {
-        if (typeof (__part) != "string") throw new Error("Function randomMainEntry Error!Wrong parameter(Not string).");
+        if (typeof (__part) !== "string") throw new Error("Function randomMainEntry Error!Wrong parameter(Not string).");
         switch (__part) {
             case "feather":
                 return "ATK";
@@ -537,7 +696,7 @@ class ArtifactsFunction_class {
      * @param {string} __entry 词条名称
      */
     randomEntryValue(__entry) {
-        if (typeof (__entry) != "string") throw new Error("Function randomEntryValue Error!Wrong parameter(Not string).");
+        if (typeof (__entry) !== "string") throw new Error("Function randomEntryValue Error!Wrong parameter(Not string).");
         return artiConst.val.entryValue[__entry][Math.floor(Math.random() * artiConst.val.entryValue[__entry].length)];
     }
 
@@ -548,9 +707,9 @@ class ArtifactsFunction_class {
      * @returns {boolean} true/false
      */
     mainEntryVerify(__part, __main) {
-        if (typeof (__part) != "string" || typeof (__main) != "string") throw new Error("Function mainEntryVerify Error!Wrong parameter(Not string).");
-        if (artiConst.val.parts.indexOf(__part) != -1 && artiConst.val.mainEntryList.indexOf(__main) != -1) {
-            if (artiConst.val[__part].indexOf(__main) != -1) {
+        if (typeof (__part) !== "string" || typeof (__main) !== "string") throw new Error("Function mainEntryVerify Error!Wrong parameter(Not string).");
+        if (artiConst.val.parts.indexOf(__part) !== -1 && artiConst.val.mainEntryList.indexOf(__main) !== -1) {
+            if (artiConst.val[__part].indexOf(__main) !== -1) {
                 return true;
             }
             return false;
@@ -565,9 +724,9 @@ class ArtifactsFunction_class {
      * @returns 
      */
     entryVerify(__mainEntry, __entryArr) {
-        if (typeof (__mainEntry) != "string" || !Array.isArray(__entryArr)) throw new Error("Function entryVerify Error!Wrong parameter.");
+        if (typeof (__mainEntry) !== "string" || !Array.isArray(__entryArr)) throw new Error("Function entryVerify Error!Wrong parameter.");
         for (let i = 0; i < __entryArr.length; i++) {
-            if (__mainEntry == __entryArr[i] || artiConst.val.entryList.indexOf(__entryArr[i]) == -1) {
+            if (__mainEntry === __entryArr[i] || artiConst.val.entryList.indexOf(__entryArr[i]) === -1) {
                 return false;
             }
         }
@@ -588,7 +747,7 @@ class ArtifactsFunction_class {
             const artifact = this.AUSList[i];
             for (let j = 0; j < artifact.entry.length; j++) {
                 const entry = artifact.entry[j];
-                if (entry[0] == "critRate" || entry[0] == "critDMG") {
+                if (entry[0] === "critRate" || entry[0] === "critDMG") {
                     while (artifact.level < 20) {
                         this.upgrade(i, entry[0], 3);
                     }
@@ -603,20 +762,24 @@ class ArtifactsFunction_class {
      * @param {string} key 键
      * @param {array | srting | object} val 值
      */
-    setLocalStorage(key,val) {
-        if(typeof(val) == "object") val = JSON.stringify(val);
-        if(typeof(val) == "number") val = val.toString();
+    setLocalStorage(key, val) {
+        if (typeof (val) === "object") val = JSON.stringify(val);
+        if (typeof (val) === "number") val = val.toString();
         let storage = window.localStorage;
-        if(!storage){
+        if (!storage) {
             throw new Error("The browser does not support LocalStorage.");
         } else {
-            storage.setItem(key,val);
+            storage.setItem(key, val);
         }
     }
 
     // 获取版本号
     get version() {
         return this.__version__;
+    }
+
+    get LSkey() {
+        return this.__localStorageKey__;
     }
 
     get AUSList() {
@@ -631,7 +794,7 @@ class ArtifactsFunction_class {
             }
             this.__AUSList__.length = 0;
             this.__AUSList__ = val;
-            this.setLocalStorage(this.localStorageKey,this.__AUSList__);
+            this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
             console.log("%cSet new Artifacts list success.", "color:rgb(144,82,41)");
         }
     }
@@ -649,24 +812,32 @@ console.log("%cArtifactsUpgradeSim is running.Learn more: https://github.com/Dio
  */
 function versionCheck() {
     let storage = window.localStorage;
-    let localList = storage[ArtifactsSim.localStorageKey];
+    let localList = storage[ArtifactsSim.LSkey];
     if (!storage) {
         throw new Error("The browser does not support LocalStorage.")
     } else {
-        if (storage.ArtifactsSimVersion == undefined) {
+        if (storage.ArtifactsSimVersion === undefined) {
             storage.ArtifactsSimVersion = ArtifactsSim.version;
             return true;
-        } else if (storage.ArtifactsSimVersion != ArtifactsSim.version) {
+        } else if (storage.ArtifactsSimVersion !== ArtifactsSim.version) {
             alert("模拟器版本更新，如果遇到错误，请尝试清除浏览器缓存!");
             storage.ArtifactsSimVersion = ArtifactsSim.version;
             return false;
         }
     }
-    if(localList != undefined && localList != "[]" && localList != ""){
+    if (localList !== undefined && localList !== "[]" && localList !== "") {
         try {
             ArtifactsSim.AUSList = JSON.parse(localList);
         } catch (error) {
             console.log("%cSet new Artifacts list fail.", "color:rgb(144,82,41)");
+        }
+        // 解析数量
+        try {
+            ArtifactsSim.AUSList.forEach(val => {
+                ArtifactsSim.changeCount([val.part, val.mainEntry]);
+            })
+        } catch (error) {
+            console.log("%cCannot set count.", "color:rgb(144,82,41)")
         }
     }
     return true;
