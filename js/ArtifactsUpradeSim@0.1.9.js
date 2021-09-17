@@ -390,7 +390,7 @@ class ArtifactsFunction_class {
     deleteOne(index) {
         let artifact = this.__AUSList__[index];
         if (artifact.lock === true) {
-            console.log("%cDelete fail.This Artifact is locked.", "color:rgb(144,82,41)");
+            // console.log("%cDelete fail.This Artifact is locked.", "color:rgb(144,82,41)");
             return false;
         } else {
             this.changeCount([artifact.part, artifact.mainEntry], -1);
@@ -404,8 +404,16 @@ class ArtifactsFunction_class {
      * 清空数据
      */
     clearAll() {
-        this.__countList__ = {};
-        this.__AUSList__.length = 0;
+        let index = 0;
+        while(index !== this.__AUSList__.length){
+            let artifact = this.__AUSList__[index];
+            if(artifact.lock === false){
+                this.__AUSList__.splice(index, 1);
+            }else {
+                index++;
+            }
+        }
+        this.enforceUpdateCount();
         this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
     }
 
@@ -501,21 +509,21 @@ class ArtifactsFunction_class {
         try {
             list.sort((val_a, val_b) => {
                 if (rule === "lvasc" || rule === "lvdesc") {
-                    // 排序优先级：先按照等级升序，再按照位置升序，最后按主属性升序
-                    if (val_a.level > val_b.level) {
+                    // 排序优先级：先按照等级升/降序，再按照位置升序，最后按主属性升序
+                    if ((val_a.level > val_b.level && rule === "lvasc") || (val_a.level < val_b.level && rule === "lvdesc") ) {
                         return 1;
-                    } else if (val_a.level < val_b.level) {
+                    } else if ((val_a.level < val_b.level && rule === "lvasc") || (val_a.level > val_b.level && rule === "lvdesc")) {
                         return -1
                     } else if (val_a.level === val_b.level) {
-                        let part_a = val_a.part.toUpperCase(),
-                            part_b = val_b.part.toUpperCase();
+                        let part_a = artiConst.val.parts.indexOf(val_a.part),
+                            part_b = artiConst.val.parts.indexOf(val_b.part);
                         if (part_a > part_b) {
                             return 1;
                         } else if (part_a < part_b) {
                             return -1;
                         } else if (part_a === part_b) {
-                            let main_a = val_a.mainEntry.toUpperCase(),
-                                main_b = val_b.mainEntry.toUpperCase();
+                            let main_a = artiConst.val.mainEntryList.indexOf(val_a.mainEntry),
+                                main_b = artiConst.val.mainEntryList.indexOf(val_b.mainEntry);
                             if (main_a > main_b) {
                                 return 1;
                             } else if (main_a < main_b) {
@@ -548,9 +556,6 @@ class ArtifactsFunction_class {
                     return 0;
                 }
             })
-            if (rule === "lvdesc") {
-                list.reverse();
-            };
             this.setLocalStorage(this.__localStorageKey__, list);
         } catch (error) {
             console.log(error);
