@@ -1,9 +1,5 @@
 /**
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
- * ArtifactsUpgradeSim v0.1.8
-=======
  * ArtifactsUpgradeSim v0.1.9
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
  * Copyrigth 2021-2022 DioMao (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/graphs/contributors)
  * Licensed under MIT (https://github.com/DioMao/genshin_ArtifactsUpgradeSim_js/blob/main/LICENSE)
  */
@@ -107,15 +103,6 @@ class ArtifactConst {
  */
 class ArtifactsFunction_class {
     constructor() {
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        this.__version__ = "0.1.8";
-        this.__AUSList__ = [];
-        this.history = [];
-        this.deleteHistory = [];
-        this.suitList = [];
-        this.__maxResults__ = 1000;
-        this.localStorageKey = "AUSLocalList";
-=======
         this.__version__ = "0.1.9";
         this.__AUSList__ = [];
         this.__deleteHistory__ = [];
@@ -123,7 +110,6 @@ class ArtifactsFunction_class {
         this.__maxResults__ = 1000;
         this.__localStorageKey__ = "AUSLocalList";
         this.__countList__ = {};
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
     }
 
     /**
@@ -209,12 +195,8 @@ class ArtifactsFunction_class {
         // 保存结果
         this.__AUSList__.push(newArtifacts);
         // console.log(newArtifacts);
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-=======
         this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
         this.changeCount([newArtifacts.part, newArtifacts.mainEntry]);
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         return newArtifacts;
     }
 
@@ -282,11 +264,7 @@ class ArtifactsFunction_class {
         currentArtifact.level += 4;
         // 增加主属性
         currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][currentArtifact.level / 4];
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-=======
         this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         return true;
     }
 
@@ -297,11 +275,7 @@ class ArtifactsFunction_class {
      * @returns 得分
      */
     ArtifactScore(__index, __rule = "default") {
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        if (typeof (__index) != "number" || (typeof (__rule) != "string" && !Array.isArray(__rule))) return 0;
-=======
         if (typeof (__index) !== "number" || (typeof (__rule) !== "string" && !Array.isArray(__rule))) return 0;
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         if (__index >= this.__AUSList__.length || __index < 0) {
             return 0;
         }
@@ -381,17 +355,6 @@ class ArtifactsFunction_class {
     /**
      * 圣遗物重置初始状态
      * @param {number} __index 序号
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-     */
-    reset(__index) {
-        let currentArtifact = this.__AUSList__[__index];
-        currentArtifact.entry.length = 0;
-        currentArtifact.entry = JSON.parse(currentArtifact.initEntry);
-        currentArtifact.upgradeHistory.length = 0;
-        currentArtifact.level = 0;
-        currentArtifact.mainEntryValue = artiConst.val.mainEntryValueList[currentArtifact.mainEntry][0];
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-=======
      * @returns 返回操作结果
      */
     reset(__index) {
@@ -407,7 +370,6 @@ class ArtifactsFunction_class {
             this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
             return true;
         }
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
     }
 
     /**
@@ -417,32 +379,11 @@ class ArtifactsFunction_class {
         for (let i = 0; i < this.__AUSList__.length; i++) {
             this.reset(i);
         }
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-=======
         this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
     }
 
     /**
      * 删除指定数据
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-     * @param {number} __del 要删除的遗物序号
-     */
-    deleteOne(__del) {
-        this.deleteHistory.push(this.__AUSList__.splice(__del, 1)[0]);
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-    }
-
-    /**
-     * 批量删除指定数据
-     * @param {array} __delArr 要删除的遗物序号（数组）
-     */
-    batchDelete(__delArr) {
-        __delArr.sort((a, b) => a - b);
-        for (let i = __delArr.length - 1; i >= 0; i--) {
-            this.deleteHistory.push(this.__AUSList__.splice(__delArr[i], 1)[0]);
-=======
      * @param {number} index 要删除的遗物序号
      * @returns 操作结果
      */
@@ -456,7 +397,6 @@ class ArtifactsFunction_class {
             this.__deleteHistory__.push(this.__AUSList__.splice(index, 1)[0]);
             this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
             return true;
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         }
     }
 
@@ -464,10 +404,6 @@ class ArtifactsFunction_class {
      * 清空数据
      */
     clearAll() {
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        this.__AUSList__.length = 0;
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-=======
         let index = 0;
         while(index !== this.__AUSList__.length){
             let artifact = this.__AUSList__[index];
@@ -479,7 +415,6 @@ class ArtifactsFunction_class {
         }
         this.enforceUpdateCount();
         this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
     }
 
     /**
@@ -491,16 +426,6 @@ class ArtifactsFunction_class {
             console.log("Undo false, history not found.");
             return false;
         }
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        this.__AUSList__.push(this.deleteHistory.pop());
-        this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-        return true;
-    }
-
-    /** 圣遗物套装 **/
-    newSuit() {
-        
-=======
         let artifact = this.__deleteHistory__.pop();
         this.__AUSList__.push(artifact);
         this.changeCount([artifact.part, artifact.mainEntry]);
@@ -656,7 +581,6 @@ class ArtifactsFunction_class {
     /** 圣遗物套装 **/
     newSuit() {
         // 暂时搁置
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
     }
 
     /** 其他函数 **/
@@ -703,11 +627,7 @@ class ArtifactsFunction_class {
     entryValFormat(entry, entryValue, type = "default") {
         const percentEntry = ["critRate", "critDMG", "ATKPer", "defPer", "HPPer", "energyRecharge"],
             nonPercentMain = ["ATK", "HP", "elementMastery"];
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        if (typeof (entry) != "string" || typeof (type) != "string" || (typeof (entryValue) != "string" && typeof (entryValue) != "number")) {
-=======
         if (typeof (entry) !== "string" || typeof (type) !== "string" || (typeof (entryValue) !== "string" && typeof (entryValue) !== "number")) {
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
             return false;
         }
         if (type.toLowerCase() === "main") {
@@ -736,11 +656,7 @@ class ArtifactsFunction_class {
      */
     randomRate(__arr1, __arr2) {
         if (!Array.isArray(__arr1) || !Array.isArray(__arr2)) throw new Error("Function RandomRate Warning!Wrong parameter.");
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        if (__arr1.length != __arr2.length) throw new Error("Function RandomRate Warning!Array length different!");
-=======
         if (__arr1.length !== __arr2.length) throw new Error("Function RandomRate Warning!Array length different!");
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         let __rand = Math.random(),
             __rate = 0,
             __totalRate = 0;
@@ -762,11 +678,7 @@ class ArtifactsFunction_class {
      * @param {string} __part 位置
      */
     randomMainEntry(__part) {
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        if (typeof (__part) != "string") throw new Error("Function randomMainEntry Error!Wrong parameter(Not string).");
-=======
         if (typeof (__part) !== "string") throw new Error("Function randomMainEntry Error!Wrong parameter(Not string).");
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         switch (__part) {
             case "feather":
                 return "ATK";
@@ -789,11 +701,7 @@ class ArtifactsFunction_class {
      * @param {string} __entry 词条名称
      */
     randomEntryValue(__entry) {
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        if (typeof (__entry) != "string") throw new Error("Function randomEntryValue Error!Wrong parameter(Not string).");
-=======
         if (typeof (__entry) !== "string") throw new Error("Function randomEntryValue Error!Wrong parameter(Not string).");
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         return artiConst.val.entryValue[__entry][Math.floor(Math.random() * artiConst.val.entryValue[__entry].length)];
     }
 
@@ -804,15 +712,9 @@ class ArtifactsFunction_class {
      * @returns {boolean} true/false
      */
     mainEntryVerify(__part, __main) {
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        if (typeof (__part) != "string" || typeof (__main) != "string") throw new Error("Function mainEntryVerify Error!Wrong parameter(Not string).");
-        if (artiConst.val.parts.indexOf(__part) != -1 && artiConst.val.mainEntryList.indexOf(__main) != -1) {
-            if (artiConst.val[__part].indexOf(__main) != -1) {
-=======
         if (typeof (__part) !== "string" || typeof (__main) !== "string") throw new Error("Function mainEntryVerify Error!Wrong parameter(Not string).");
         if (artiConst.val.parts.indexOf(__part) !== -1 && artiConst.val.mainEntryList.indexOf(__main) !== -1) {
             if (artiConst.val[__part].indexOf(__main) !== -1) {
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
                 return true;
             }
             return false;
@@ -827,11 +729,7 @@ class ArtifactsFunction_class {
      * @returns 
      */
     entryVerify(__mainEntry, __entryArr) {
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-        if (typeof (__mainEntry) != "string" || !Array.isArray(__entryArr)) throw new Error("Function entryVerify Error!Wrong parameter.");
-=======
         if (typeof (__mainEntry) !== "string" || !Array.isArray(__entryArr)) throw new Error("Function entryVerify Error!Wrong parameter.");
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         for (let i = 0; i < __entryArr.length; i++) {
             if (__mainEntry === __entryArr[i] || artiConst.val.entryList.indexOf(__entryArr[i]) === -1) {
                 return false;
@@ -869,16 +767,6 @@ class ArtifactsFunction_class {
      * @param {string} key 键
      * @param {array | srting | object} val 值
      */
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-    setLocalStorage(key,val) {
-        if(typeof(val) == "object") val = JSON.stringify(val);
-        if(typeof(val) == "number") val = val.toString();
-        let storage = window.localStorage;
-        if(!storage){
-            throw new Error("The browser does not support LocalStorage.");
-        } else {
-            storage.setItem(key,val);
-=======
     setLocalStorage(key, val) {
         if (typeof (val) === "object") val = JSON.stringify(val);
         if (typeof (val) === "number") val = val.toString();
@@ -887,7 +775,6 @@ class ArtifactsFunction_class {
             throw new Error("The browser does not support LocalStorage.");
         } else {
             storage.setItem(key, val);
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         }
     }
 
@@ -896,13 +783,10 @@ class ArtifactsFunction_class {
         return this.__version__;
     }
 
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-=======
     get LSkey() {
         return this.__localStorageKey__;
     }
 
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
     get AUSList() {
         return this.__AUSList__;
     }
@@ -915,11 +799,7 @@ class ArtifactsFunction_class {
             }
             this.__AUSList__.length = 0;
             this.__AUSList__ = val;
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-            this.setLocalStorage(this.localStorageKey,this.__AUSList__);
-=======
             this.setLocalStorage(this.__localStorageKey__, this.__AUSList__);
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
             console.log("%cSet new Artifacts list success.", "color:rgb(144,82,41)");
         }
     }
@@ -937,11 +817,7 @@ console.log("%cArtifactsUpgradeSim is running.Learn more: https://github.com/Dio
  */
 function versionCheck() {
     let storage = window.localStorage;
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-    let localList = storage[ArtifactsSim.localStorageKey];
-=======
     let localList = storage[ArtifactsSim.LSkey];
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
     if (!storage) {
         throw new Error("The browser does not support LocalStorage.")
     } else {
@@ -954,18 +830,12 @@ function versionCheck() {
             return false;
         }
     }
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-    if(localList != undefined && localList != "[]" && localList != ""){
-=======
     if (localList !== undefined && localList !== "[]" && localList !== "") {
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
         try {
             ArtifactsSim.AUSList = JSON.parse(localList);
         } catch (error) {
             console.log("%cSet new Artifacts list fail.", "color:rgb(144,82,41)");
         }
-<<<<<<< HEAD:js/ArtifactsUpradeSim@0.1.8.js
-=======
         // 解析数量
         try {
             ArtifactsSim.AUSList.forEach(val => {
@@ -974,7 +844,6 @@ function versionCheck() {
         } catch (error) {
             console.log("%cCannot set count.", "color:rgb(144,82,41)")
         }
->>>>>>> pre_version:js/ArtifactsUpradeSim@0.1.9.js
     }
     return true;
 }
