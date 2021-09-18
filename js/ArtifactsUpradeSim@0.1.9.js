@@ -77,11 +77,13 @@ class ArtifactConst {
                 HPPer: 1.345,
                 energyRecharge: 1.2,
                 elementMastery: 0.339
-            }
+            },
+            // 每级升级经验
+            exp: [3000, 3725, 4425, 5150, 5900, 6675, 7500, 8350, 9225, 10125, 11050, 12025, 13025, 15150, 17600, 20375, 23500, 27050, 31050, 35575]
         }
         // 设置只读
         const nope = () => {
-                throw new Error("Error!This data is read only!")
+                throw new Error("Error!This data is read only!");
             },
             read_only = (obj) => new Proxy(obj, {
                 set: nope,
@@ -405,11 +407,11 @@ class ArtifactsFunction_class {
      */
     clearAll() {
         let index = 0;
-        while(index !== this.__AUSList__.length){
+        while (index !== this.__AUSList__.length) {
             let artifact = this.__AUSList__[index];
-            if(artifact.lock === false){
+            if (artifact.lock === false) {
                 this.__AUSList__.splice(index, 1);
-            }else {
+            } else {
                 index++;
             }
         }
@@ -510,7 +512,7 @@ class ArtifactsFunction_class {
             list.sort((val_a, val_b) => {
                 if (rule === "lvasc" || rule === "lvdesc") {
                     // 排序优先级：先按照等级升/降序，再按照位置升序，最后按主属性升序
-                    if ((val_a.level > val_b.level && rule === "lvasc") || (val_a.level < val_b.level && rule === "lvdesc") ) {
+                    if ((val_a.level > val_b.level && rule === "lvasc") || (val_a.level < val_b.level && rule === "lvdesc")) {
                         return 1;
                     } else if ((val_a.level < val_b.level && rule === "lvasc") || (val_a.level > val_b.level && rule === "lvdesc")) {
                         return -1
@@ -536,8 +538,15 @@ class ArtifactsFunction_class {
                 };
                 if (rule === "part" || rule === "mainEntry") {
                     // 排序优先级：先按照part/mainEntry升序，再按照等级降序排列
-                    let name_a = val_a[rule].toUpperCase(),
-                        name_b = val_b[rule].toUpperCase();
+                    let name_a = artiConst.val.mainEntryList.indexOf(val_a[rule]),
+                        name_b = artiConst.val.mainEntryList.indexOf(val_b[rule]);
+                    if (rule === "part") {
+                        rule = "mainEntry";
+                    } else {
+                        rule = "part";
+                    }
+                    let name_a2 = artiConst.val.mainEntryList.indexOf(val_a[rule]),
+                        name_b2 = artiConst.val.mainEntryList.indexOf(val_a[rule]);
                     if (name_a > name_b) {
                         return 1;
                     }
@@ -545,12 +554,18 @@ class ArtifactsFunction_class {
                         return -1;
                     }
                     if (name_a === name_b) {
-                        if (val_a.level > val_b.level) {
-                            return -1
-                        } else if (val_a.level < val_b.level) {
-                            return 1
-                        } else {
-                            return 0;
+                        if (name_a2 > name_b2) {
+                            return 1;
+                        } else if (name_a2 < name_b2) {
+                            return -1;
+                        } else if (name_a2 = name_b2) {
+                            if (val_a.level > val_b.level) {
+                                return -1
+                            } else if (val_a.level < val_b.level) {
+                                return 1
+                            } else {
+                                return 0;
+                            }
                         }
                     }
                     return 0;
@@ -576,11 +591,6 @@ class ArtifactsFunction_class {
             }
         }
         return -1;
-    }
-
-    /** 圣遗物套装 **/
-    newSuit() {
-        // 暂时搁置
     }
 
     /** 其他函数 **/
@@ -812,22 +822,21 @@ console.log("%cArtifactsUpgradeSim is running.Learn more: https://github.com/Dio
 /** --------------------------------辅助函数-------------------------------- **/
 
 /**
- * 模拟器版本检查+读取localStorage
+ * 模拟器初始化
  * @returns 检查结果
  */
-function versionCheck() {
+function initSim() {
+    // 加载本地数据
     let storage = window.localStorage;
     let localList = storage[ArtifactsSim.LSkey];
     if (!storage) {
-        throw new Error("The browser does not support LocalStorage.")
+        throw new Error("The browser does not support LocalStorage.");
     } else {
         if (storage.ArtifactsSimVersion === undefined) {
             storage.ArtifactsSimVersion = ArtifactsSim.version;
-            return true;
         } else if (storage.ArtifactsSimVersion !== ArtifactsSim.version) {
             alert("模拟器版本更新，如果遇到错误，请尝试清除浏览器缓存!");
             storage.ArtifactsSimVersion = ArtifactsSim.version;
-            return false;
         }
     }
     if (localList !== undefined && localList !== "[]" && localList !== "") {
@@ -836,18 +845,24 @@ function versionCheck() {
         } catch (error) {
             console.log("%cSet new Artifacts list fail.", "color:rgb(144,82,41)");
         }
-        // 解析数量
+        // 解析数量+兼容旧版
         try {
             ArtifactsSim.AUSList.forEach(val => {
                 ArtifactsSim.changeCount([val.part, val.mainEntry]);
+                // 兼容旧版数据
+                if (!val.hasOwnProperty("symbol")) {
+                    val.symbol = Date.now().toString(36) + "-" + Math.random().toString(36).substring(2);
+                }
+                if (!val.hasOwnProperty("lock")) {
+                    val.lock = false;
+                }
             })
         } catch (error) {
-            console.log("%cCannot set count.", "color:rgb(144,82,41)")
+            console.log("%cCannot set count.", "color:rgb(144,82,41)");
         }
     }
-    return true;
 }
-versionCheck();
+initSim();
 
 // export {
 //     ArtifactsSim,
