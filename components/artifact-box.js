@@ -387,7 +387,7 @@ app.component("artifact-box", {
     computed: {
         ArtifactScore() {
             let mode = this.userSetting.scoreConfig.mode,
-                index = this.showIndex,
+                index = this.showIndex;
                 this.ArtifactsList[index]; // 监听当前圣遗物数据，更新评分视图用
             if (mode === "string") {
                 return ArtifactsSim.ArtifactScore(index, this.userSetting.scoreConfig.strRule).toFixed(2);
@@ -445,7 +445,7 @@ app.component("artifact-box", {
         ArtifactUpgrade(index, entry = "") {
             let res = ArtifactsSim.upgrade(index, entry, this.userSetting.entryQuality),
                 qualityAlert = "";
-            if (this.userSetting.entryQuality !== -1) qualityAlert = "已启用副词条自选提升幅度！"
+            if (Number.parseFloat(this.userSetting.entryQuality) !== -1) qualityAlert = "已启用副词条自选提升幅度！"
             this.syncListData();
             if (res === true) {
                 this.alertControl(`升级成功！${qualityAlert}`, 1500);
@@ -672,6 +672,7 @@ app.component("artifact-box", {
             let containerWidth = this.$refs.scrollListener.offsetWidth - 24 - 6,
                 // 获1rem值
                 html = document.getElementsByTagName("html"),
+                count = 0,
                 htmlStyle = window.getComputedStyle(html[0]).fontSize.slice(0, -2),
                 // 计算圣遗物组件宽度
                 itemWidth = 11.25 * Number.parseFloat(htmlStyle),
