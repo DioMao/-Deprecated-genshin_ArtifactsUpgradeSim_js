@@ -1,4 +1,6 @@
-# 原来，你也玩原神。
+# 此处的Demo暂停更新（仍可下载试用）。后续更新会迁移到Vue版本：
+
+https://github.com/DioMao/genshin_ArtifactsUpgradeSim_vue
 
 ### 原神圣遗物强化模拟
 

@@ -388,7 +388,7 @@ app.component("artifact-box", {
         ArtifactScore() {
             let mode = this.userSetting.scoreConfig.mode,
                 index = this.showIndex,
-                artifact = this.ArtifactsList[index]; // 监听当前圣遗物数据，更新评分视图用
+                this.ArtifactsList[index]; // 监听当前圣遗物数据，更新评分视图用
             if (mode === "string") {
                 return ArtifactsSim.ArtifactScore(index, this.userSetting.scoreConfig.strRule).toFixed(2);
             } else if (mode === "array") {
@@ -416,8 +416,9 @@ app.component("artifact-box", {
         userSetting: {
             handler(val) {
                 if (this.showIndex >= 0 && val.filterPart !== "default" && this.ArtifactsList[this.showIndex].part !== val.filterPart) this.showSymbol = "";
-                if (this.showIndex >= 0 && val.filterMain !== "default" && this.ArtifactsList[this.showIndex].mainEntry !== val.filterMain) this.symbol = "";
-                this.changeSetting()
+                if (this.showIndex >= 0 && val.filterMain !== "default" && this.ArtifactsList[this.showIndex].mainEntry !== val.filterMain) this.showSymbol = "";
+                this.changeSetting();
+                this.getFillCount();
             },
             deep: true
         }
@@ -681,7 +682,17 @@ app.component("artifact-box", {
                     itemMax = 2;
                 }
             // 计算需要填充的数量（flex布局-center，需要把组件挤到左边）
-            this.fillCount = itemMax - (ArtifactsSim.AUSList.length % itemMax);
+            // 计算出筛选出来的列表数量
+            ArtifactsSim.AUSList.forEach(val => {
+                if(this.userSetting.filterMain !== "default") {
+                    val.mainEntry === this.userSetting.filterMain ? count++ : null;
+                }else if(this.userSetting.filterPart !== "default") {
+                    val.part === this.userSetting.filterPart ? count++ : null;
+                }else{
+                    count++;
+                }
+            })
+            this.fillCount = itemMax - (count % itemMax);
             if (this.fillCount === itemMax) this.fillCount = 0;
             // console.log(containerWidth + " " + itemMax + " ");
         }

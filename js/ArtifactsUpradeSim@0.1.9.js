@@ -217,7 +217,7 @@ class ArtifactsFunction_class {
         if (currentArtifact.level >= 20) {
             // console.log("Upgrade failed,this Artifact is fully rated.");
             return false;
-        };
+        }
         // 是否需要补充词条
         if (currentArtifact.entry.length < 4) {
             for (let i = 0; i < currentArtifact.entry.length; i++) {
@@ -446,7 +446,7 @@ class ArtifactsFunction_class {
             key = [key];
         }
         key.forEach(val => {
-            if (countList.hasOwnProperty(val)) {
+            if (Object.prototype.hasOwnProperty.call(countList, val)) {
                 countList[val] = countList[val] + range;
             } else {
                 countList[val] = range;
@@ -490,7 +490,7 @@ class ArtifactsFunction_class {
     getCount(key) {
         if (typeof (key) !== "string") return false;
         let countList = this.__countList__;
-        if (countList.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(countList, key)) {
             return countList[key];
         } else {
             return 0;
@@ -533,7 +533,7 @@ class ArtifactsFunction_class {
                             }
                         }
                     }
-                };
+                }
                 if (rule === "part" || rule === "mainEntry") {
                     // 排序优先级：先按照part/mainEntry升序，再按照等级降序排列
                     let name_a = val_a[rule].toUpperCase(),
@@ -545,12 +545,18 @@ class ArtifactsFunction_class {
                         return -1;
                     }
                     if (name_a === name_b) {
-                        if (val_a.level > val_b.level) {
-                            return -1
-                        } else if (val_a.level < val_b.level) {
-                            return 1
-                        } else {
-                            return 0;
+                        if (name_a2 > name_b2) {
+                            return 1;
+                        } else if (name_a2 < name_b2) {
+                            return -1;
+                        } else if (name_a2 === name_b2) {
+                            if (val_a.level > val_b.level) {
+                                return -1
+                            } else if (val_a.level < val_b.level) {
+                                return 1
+                            } else {
+                                return 0;
+                            }
                         }
                     }
                     return 0;
@@ -840,6 +846,13 @@ function versionCheck() {
         try {
             ArtifactsSim.AUSList.forEach(val => {
                 ArtifactsSim.changeCount([val.part, val.mainEntry]);
+                // 兼容旧版数据
+                if (!Object.prototype.hasOwnProperty.call(val, "symbol")) {
+                    val.symbol = Date.now().toString(36) + "-" + Math.random().toString(36).substring(2);
+                }
+                if (!Object.prototype.hasOwnProperty.call(val, "lock")) {
+                    val.lock = false;
+                }
             })
         } catch (error) {
             console.log("%cCannot set count.", "color:rgb(144,82,41)")
