@@ -34,7 +34,7 @@ https://github.com/DioMao/genshin_ArtifactsUpgradeSim_vue
 
 GIt: https://diomao.github.io/artifacts_sim_demo
 
-国内CDN: http://ys.noworklife.cn （国内路线比Git快点，但是不太稳定，如果加载不出来就多刷新几次）
+国内: https://juanweimao.gitee.io/artifacts_sim_demo
 
 ---
 
